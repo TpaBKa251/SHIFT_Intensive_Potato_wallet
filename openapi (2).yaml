@@ -596,7 +596,7 @@ paths:
           description: Пользователь-отправитель или пользователь-получатель не найдены.
         '422':
           description: Ошибка валидации.  
-  /transfers/toUser/byEmail/{email}:
+  /transfers/toUser/byID/{resipientID}:
     post:
       tags:
         - transfer
@@ -607,15 +607,15 @@ paths:
           - readSingleTransfer      
       operationId: transferToUserByEmail;
       parameters:
-        - name: email
+        - name: resipientID
           in: path
           description: Email пользователя, которому необходимо перевести деньги.
           required: true
           schema:
-            type: string
+            type: integer
+            format: int64
             nullable: false
-            pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-            example: example@email.com
+            example: 78214
       requestBody:
         content:
           application/json:
@@ -777,7 +777,7 @@ paths:
         - potatoOAuth2:
           - createSession
           - readUser
-      operationId: createSessionByPhoneNumber
+      operationId: createSession
       parameters:
         - name: userId
           in: path
