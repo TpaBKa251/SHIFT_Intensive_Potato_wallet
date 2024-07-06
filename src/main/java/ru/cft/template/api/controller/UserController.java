@@ -1,8 +1,11 @@
-package ru.cft.template.api;
+package ru.cft.template.api.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.cft.template.model.User;
+import ru.cft.template.api.dto.UserCreateRequest;
+import ru.cft.template.core.entity.User;
+import ru.cft.template.core.service.UserService;
 
 @RequestMapping("/potato/api/users")
 @Slf4j
@@ -27,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(){
+    public User create(@Valid @RequestBody UserCreateRequest user){
         log.info("Success");
         return null;
     }

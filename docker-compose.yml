@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=wallet
     ports:
       - "5432:5432"
-  # Сервис для разворачивания контейнера с приложением
+#   Сервис для разворачивания контейнера с приложением
 #  webapi:
 #    build:
 #      dockerfile: Dockerfile
