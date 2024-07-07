@@ -4,14 +4,13 @@ import java.util.Date;
 
 public record UserResponse(
         String id,
-        String walletID,
+        String walletId,
         String firstName,
         String lastName,
-        //String middleName,
+        String fullName,
         String email,
-        Long phoneNumber,
+        Long phone,
         Date registrationDate,
         Date lastUpdateDate,
-        Integer age
-) {
-}
+        Date birthDate
+) { }

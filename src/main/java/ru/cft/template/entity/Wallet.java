@@ -18,5 +18,5 @@ public class Wallet {
     private Long amount;
 
     @Column(nullable = false)
-    private Date lastUpdated = new Date();
+    private Date lastUpdate = new Date();
 }

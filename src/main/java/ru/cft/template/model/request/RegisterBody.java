@@ -1,12 +1,12 @@
 package ru.cft.template.model.request;
 
+import java.util.Date;
+
 public record RegisterBody(
-        Long phoneNumber,
+        Long phone,
         String password,
         String firstName,
         String lastName,
-        String middleName,
         String email,
-        Integer age
-) {
-}
+        Date birthDate
+) { }

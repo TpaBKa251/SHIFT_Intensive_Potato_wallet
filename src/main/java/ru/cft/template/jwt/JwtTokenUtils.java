@@ -1,12 +1,12 @@
 package ru.cft.template.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import io.jsonwebtoken.Jwts;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -27,25 +27,25 @@ public class JwtTokenUtils {
     private String secret;
 
     @Value("${jwt.lifetime}")
-    private Duration lifetime;
+    private Duration jwtLifetime;
 
-    public String generateToken(User user) {
+    public String generateToken(User user){
         Map<String, Object> claims = new HashMap<>();
 
         Date issuedDate = new Date();
-        Date expiryDate = new Date(issuedDate.getTime() + lifetime.toMillis());
+        Date expiredDate = new Date(issuedDate.getTime() + jwtLifetime.toMillis());
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(user.getEmail())
                 .claim("userId", user.getId().toString())
                 .setIssuedAt(issuedDate)
-                .setExpiration(expiryDate)
+                .setExpiration(expiredDate)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public UUID getUserIdFromToken(String token) {
+    public UUID getUserIdFromToken(String token){
         String userId = getAllClaimsFromToken(token).get("userId", String.class);
         return UUID.fromString(userId);
     }

@@ -7,31 +7,29 @@ import ru.cft.template.model.response.UserResponse;
 
 @Component
 public class UserMapper {
-    public static User mapRegisterBodyToUser(RegisterBody registerBody) {
+    public static User mapRegisterBodyToUser(RegisterBody body) {
         User user = new User();
-        user.setAge(registerBody.age());
-        user.setEmail(registerBody.email());
-        user.setFirstName(registerBody.firstName());
-        user.setLastName(registerBody.lastName());
-        user.setPassword(registerBody.password());
-        //user.setMiddleName(registerBody.middleName());
-        user.setPhone(registerBody.phoneNumber());
-
+        user.setBirthDate(body.birthDate());
+        user.setPassword(body.password());
+        user.setFirstName(body.firstName());
+        user.setLastName(body.lastName());
+        user.setEmail(body.email());
+        user.setPhone(body.phone());
         return user;
     }
 
-    public static UserResponse mapToResponse(User user) {
+    public static UserResponse mapUserToResponse(User user) {
         return new UserResponse(
                 user.getId().toString(),
                 user.getWallet().getId().toString(),
                 user.getFirstName(),
                 user.getLastName(),
-                //user.getMiddleName(),
+                user.getFirstName() + " " + user.getLastName(),
                 user.getEmail(),
                 user.getPhone(),
                 user.getRegistrationDate(),
                 user.getLastUpdateDate(),
-                user.getAge()
+                user.getBirthDate()
         );
     }
 }

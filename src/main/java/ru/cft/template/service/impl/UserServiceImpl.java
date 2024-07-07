@@ -1,4 +1,4 @@
-package ru.cft.template.service.serviceimpl;
+package ru.cft.template.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -6,15 +6,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.cft.template.dto.UserInfo;
 import ru.cft.template.entity.User;
 import ru.cft.template.entity.Wallet;
-import ru.cft.template.jwt.JwtTokenUtils;
+//import ru.cft.template.exception.BadTransactionException;
 import ru.cft.template.mapper.UserMapper;
 import ru.cft.template.model.request.RegisterBody;
-import ru.cft.template.model.request.UserUpdateBody;
 import ru.cft.template.model.response.TokenResponse;
 import ru.cft.template.model.response.UserResponse;
+import ru.cft.template.model.request.UserUpdateBody;
 import ru.cft.template.repository.UserRepository;
+import ru.cft.template.jwt.JwtTokenUtils;
 import ru.cft.template.service.WalletService;
 
 import java.util.UUID;
@@ -27,10 +29,10 @@ public class UserServiceImpl implements UserDetailsService {
     private final WalletService walletService;
     private final JwtTokenUtils jwtTokenUtils;
 
-    public TokenResponse registerUser(RegisterBody registerBody) {
-        User user = UserMapper.mapRegisterBodyToUser(registerBody);
-        Wallet wallet = walletService.createWallet();
-        user.setWallet(wallet);
+    public TokenResponse registerUser(RegisterBody body) {
+        User user = UserMapper.mapRegisterBodyToUser(body);
+        Wallet newWallet = walletService.createWallet();
+        user.setWallet(newWallet);
         userRepository.save(user);
 
         return TokenResponse.builder()
@@ -43,7 +45,7 @@ public class UserServiceImpl implements UserDetailsService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));
 
-        return UserMapper.mapToResponse(user);
+        return UserMapper.mapUserToResponse(user);
     }
 
     public User getUserByAuthentication(Authentication authentication) {
@@ -53,41 +55,29 @@ public class UserServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));
     }
 
-    public UserResponse updateUser(Authentication authentication, UserUpdateBody updateBody) {
+
+    public UserResponse updateUser(Authentication authentication, UserUpdateBody body){
         UUID id = jwtTokenUtils.getUserIdFromAuthentication(authentication);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));
 
-        if (updateBody.firstName() != null){
-            user.setFirstName(updateBody.firstName());
+        if (body.firstName() != null) {
+            user.setFirstName(body.firstName());
         }
-        if (updateBody.lastName() != null){
-            user.setLastName(updateBody.lastName());
+        if (body.lastName() != null) {
+            user.setLastName(body.lastName());
         }
-        /*if (updateBody.middleName() != null){
-            user.setMiddleName(updateBody.middleName());
-        }*/
-        if (updateBody.age() != null){
-            user.setAge(updateBody.age());
+        if (body.email() != null) {
+            user.setEmail(body.email());
         }
 
         userRepository.save(user);
-        return UserMapper.mapToResponse(user);
+        return UserMapper.mapUserToResponse(user);
     }
 
     public User findUserByPhone(Long phone) {
         return userRepository.findByPhone(phone)
                 .orElseThrow(() -> new UsernameNotFoundException("User with phone: " + phone + " not found"));
-    }
-
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
-    }
-
-    public User findUserById(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));
     }
 
     @Override
