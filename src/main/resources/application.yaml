@@ -1,7 +1,16 @@
 server:
     port: 8080
 
+jwt:
+    secret: r1Wq3Y7Ql8ivrpC4A6vEgBg1kllCKCrFkwhbZUNZ6Y8=
+    lifetime: 30m
+
 spring:
+    jpa:
+        show-sql: true
+        properties:
+            hibernate:
+                format_sql: true
     datasource:
         # По умолчанию postgresql имеет 5432 порт. Но так как подразумевается запуск через docker-compose, указан порт
         # из docker-compose.yaml для корректной проброски. Если у вас локально установлен postgresql и вы собираетесь
@@ -13,3 +22,7 @@ spring:
         enabled: true
         locations:
           - db.migration
+
+springdoc:
+    swagger-ui:
+        enabled: true

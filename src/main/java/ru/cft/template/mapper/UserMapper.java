@@ -14,8 +14,8 @@ public class UserMapper {
         user.setFirstName(registerBody.firstName());
         user.setLastName(registerBody.lastName());
         user.setPassword(registerBody.password());
-        user.setMiddleName(registerBody.middleName());
-        user.setPhoneNumber(registerBody.phoneNumber());
+        //user.setMiddleName(registerBody.middleName());
+        user.setPhone(registerBody.phoneNumber());
 
         return user;
     }
@@ -26,9 +26,9 @@ public class UserMapper {
                 user.getWallet().getId().toString(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getMiddleName(),
+                //user.getMiddleName(),
                 user.getEmail(),
-                user.getPhoneNumber(),
+                user.getPhone(),
                 user.getRegistrationDate(),
                 user.getLastUpdateDate(),
                 user.getAge()

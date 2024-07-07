@@ -7,7 +7,7 @@ public record UserResponse(
         String walletID,
         String firstName,
         String lastName,
-        String middleName,
+        //String middleName,
         String email,
         Long phoneNumber,
         Date registrationDate,
