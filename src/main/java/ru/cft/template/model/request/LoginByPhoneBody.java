@@ -1,6 +1,6 @@
 package ru.cft.template.model.request;
 
-public record LoginBody(
+public record LoginByPhoneBody(
      Long phone,
      String password
 ) {

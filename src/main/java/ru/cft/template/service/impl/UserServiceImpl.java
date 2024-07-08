@@ -78,7 +78,12 @@ public class UserServiceImpl implements UserDetailsService {
         return UserMapper.mapUserToResponse(user);
     }
 
-    public UserInfoResponse findUserByPhone(Long phone) {
+    public UserInfoResponse getUserByPhone(Long phone) {
+        return userRepository.getByPhone(phone)
+                .orElseThrow(() -> new UsernameNotFoundException("User with phone: " + phone + " not found"));
+    }
+
+    public User findUserByPhone(Long phone) {
         return userRepository.findByPhone(phone)
                 .orElseThrow(() -> new UsernameNotFoundException("User with phone: " + phone + " not found"));
     }

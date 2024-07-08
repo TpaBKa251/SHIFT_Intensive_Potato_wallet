@@ -40,7 +40,7 @@ public class UserController {
     @GetMapping("/{phoneNumber}")
     public ResponseEntity<UserInfoResponse> getUser(@PathVariable Long phoneNumber){
         log.info("Получено");
-        return ResponseEntity.ok(userService.findUserByPhone(phoneNumber));
+        return ResponseEntity.ok(userService.getUserByPhone(phoneNumber));
     }
 
     /*@GetMapping("/{email}")
