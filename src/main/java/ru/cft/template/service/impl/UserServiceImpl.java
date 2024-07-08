@@ -6,13 +6,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.cft.template.dto.UserInfo;
 import ru.cft.template.entity.User;
 import ru.cft.template.entity.Wallet;
 //import ru.cft.template.exception.BadTransactionException;
 import ru.cft.template.mapper.UserMapper;
 import ru.cft.template.model.request.RegisterBody;
 import ru.cft.template.model.response.TokenResponse;
+import ru.cft.template.model.response.UserInfoResponse;
 import ru.cft.template.model.response.UserResponse;
 import ru.cft.template.model.request.UserUpdateBody;
 import ru.cft.template.repository.UserRepository;
@@ -67,18 +67,26 @@ public class UserServiceImpl implements UserDetailsService {
         if (body.lastName() != null) {
             user.setLastName(body.lastName());
         }
-        if (body.email() != null) {
-            user.setEmail(body.email());
+        if (body.middleName() != null){
+            user.setMiddleName(body.middleName());
+        }
+        if (body.birthDate() != null){
+            user.setBirthDate(body.birthDate());
         }
 
         userRepository.save(user);
         return UserMapper.mapUserToResponse(user);
     }
 
-    public User findUserByPhone(Long phone) {
+    public UserInfoResponse findUserByPhone(Long phone) {
         return userRepository.findByPhone(phone)
                 .orElseThrow(() -> new UsernameNotFoundException("User with phone: " + phone + " not found"));
     }
+
+    /*public UserInfoResponse findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
+    }*/
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

@@ -9,6 +9,7 @@ import ru.cft.template.entity.User;
 import ru.cft.template.model.request.RegisterBody;
 import ru.cft.template.model.request.UserUpdateBody;
 import ru.cft.template.model.response.TokenResponse;
+import ru.cft.template.model.response.UserInfoResponse;
 import ru.cft.template.model.response.UserResponse;
 import ru.cft.template.service.impl.UserServiceImpl;
 
@@ -21,6 +22,7 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<TokenResponse> registerUser(@RequestBody RegisterBody body) {
+        log.info("Registering user: {}", body);
         return ResponseEntity.ok(userService.registerUser(body));
     }
 
@@ -36,8 +38,14 @@ public class UserController {
     }
 
     @GetMapping("/{phoneNumber}")
-    public ResponseEntity<User> getUser(@PathVariable Long phoneNumber){
+    public ResponseEntity<UserInfoResponse> getUser(@PathVariable Long phoneNumber){
         log.info("Получено");
         return ResponseEntity.ok(userService.findUserByPhone(phoneNumber));
     }
+
+    /*@GetMapping("/{email}")
+    public ResponseEntity<UserInfoResponse> getUser(@PathVariable String email){
+        log.info("Получено");
+        return ResponseEntity.ok(userService.findUserByEmail(email));
+    }*/
 }

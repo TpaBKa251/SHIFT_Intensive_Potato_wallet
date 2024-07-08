@@ -1,9 +1,12 @@
 package ru.cft.template.model.request;
 
 
+import java.util.Date;
+
 public record UserUpdateBody(
         String firstName,
         String lastName,
-        String email
+        String middleName,
+        Date birthDate
 ) {
 }
