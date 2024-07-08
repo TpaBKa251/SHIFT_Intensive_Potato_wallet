@@ -1,5 +1,6 @@
 package ru.cft.template.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,8 +30,10 @@ public class UserServiceImpl implements UserDetailsService {
     private final WalletService walletService;
     private final JwtTokenUtils jwtTokenUtils;
 
+    @Transactional
     public TokenResponse registerUser(RegisterBody body) {
         User user = UserMapper.mapRegisterBodyToUser(body);
+        validateUser(user);
         Wallet newWallet = walletService.createWallet();
         user.setWallet(newWallet);
         userRepository.save(user);
@@ -38,6 +41,12 @@ public class UserServiceImpl implements UserDetailsService {
         return TokenResponse.builder()
                 .token(jwtTokenUtils.generateToken(user))
                 .build();
+    }
+
+    private void validateUser(User user) {
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            throw new IllegalArgumentException("Username cannot be empty");
+        }
     }
 
     public UserResponse getUserResponseByAuthentication(Authentication authentication) {
