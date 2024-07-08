@@ -29,7 +29,7 @@ public class JwtTokenUtils {
     @Value("${jwt.lifetime}")
     private Duration jwtLifetime;
 
-    public String generateToken(User user){
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
 
         Date issuedDate = new Date();
@@ -45,7 +45,7 @@ public class JwtTokenUtils {
                 .compact();
     }
 
-    public UUID getUserIdFromToken(String token){
+    public UUID getUserIdFromToken(String token) {
         String userId = getAllClaimsFromToken(token).get("userId", String.class);
         return UUID.fromString(userId);
     }

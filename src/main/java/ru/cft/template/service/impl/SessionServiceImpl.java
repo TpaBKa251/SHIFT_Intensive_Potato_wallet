@@ -33,7 +33,6 @@ public class SessionServiceImpl implements SessionService {
     private final BannedTokenRepository bannedTokenRepository;
 
 
-
     @Override
     public SessionResponse createSessionByEmail(LoginByEmailBody body) {
         User user = userRepository.findByEmail(body.email())
@@ -98,7 +97,7 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public CurrentSessionResponse getCurrentSession(Authentication authentication) {
-        String currentToken = (String)authentication.getCredentials();
+        String currentToken = (String) authentication.getCredentials();
 
         Optional<Session> sessionOptional = sessionRepository.findByToken(currentToken);
         if (sessionOptional.isPresent()) {

@@ -23,7 +23,7 @@ public class WalletServiceImpl implements WalletService {
     private final UserRepository userRepository;
     private final JwtTokenUtils jwtTokenUtils;
 
-    public WalletResponse getUserWallet(Authentication authentication){
+    public WalletResponse getUserWallet(Authentication authentication) {
         UUID id = jwtTokenUtils.getUserIdFromAuthentication(authentication);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));

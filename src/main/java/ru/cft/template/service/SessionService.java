@@ -13,9 +13,11 @@ import java.util.UUID;
 
 public interface SessionService {
     SessionResponse createSessionByEmail(LoginByEmailBody body);
+
     SessionResponse loginByPhone(LoginByPhoneBody body);
 
     List<CurrentSessionResponse> getAllSessions(Authentication authentication);
+
     List<CurrentSessionResponse> getAllSessionsByActive(Authentication authentication, Boolean active);
 
     CurrentSessionResponse getCurrentSession(Authentication authentication);

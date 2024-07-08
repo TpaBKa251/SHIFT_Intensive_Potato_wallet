@@ -1,6 +1,6 @@
 package ru.cft.template.exception;
 
-public class WalletNotFoundException extends RuntimeException{
+public class WalletNotFoundException extends RuntimeException {
     public WalletNotFoundException() {
         super();
     }

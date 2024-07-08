@@ -33,12 +33,12 @@ public class UserController {
     }
 
     @PatchMapping("/edit")
-    public ResponseEntity<UserResponse> updateUser(Authentication authentication, @RequestBody UserUpdateBody body){
+    public ResponseEntity<UserResponse> updateUser(Authentication authentication, @RequestBody UserUpdateBody body) {
         return ResponseEntity.ok(userService.updateUser(authentication, body));
     }
 
     @GetMapping("/{phoneNumber}")
-    public ResponseEntity<UserInfoResponse> getUser(@PathVariable Long phoneNumber){
+    public ResponseEntity<UserInfoResponse> getUser(@PathVariable Long phoneNumber) {
         log.info("Получено");
         return ResponseEntity.ok(userService.getUserByPhone(phoneNumber));
     }

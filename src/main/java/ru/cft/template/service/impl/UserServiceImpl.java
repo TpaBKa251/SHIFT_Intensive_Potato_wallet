@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
 
-    public UserResponse updateUser(Authentication authentication, UserUpdateBody body){
+    public UserResponse updateUser(Authentication authentication, UserUpdateBody body) {
         UUID id = jwtTokenUtils.getUserIdFromAuthentication(authentication);
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));
@@ -67,10 +67,10 @@ public class UserServiceImpl implements UserDetailsService {
         if (body.lastName() != null) {
             user.setLastName(body.lastName());
         }
-        if (body.middleName() != null){
+        if (body.middleName() != null) {
             user.setMiddleName(body.middleName());
         }
-        if (body.birthDate() != null){
+        if (body.birthDate() != null) {
             user.setBirthDate(body.birthDate());
         }
 

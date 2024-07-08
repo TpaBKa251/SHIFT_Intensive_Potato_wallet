@@ -13,4 +13,5 @@ public record UserResponse(
         Date registrationDate,
         Date lastUpdateDate,
         Date birthDate
-) { }
+) {
+}

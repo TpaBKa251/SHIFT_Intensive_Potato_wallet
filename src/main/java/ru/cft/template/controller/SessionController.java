@@ -20,34 +20,34 @@ public class SessionController {
     private final SessionService sessionService;
 
     @PostMapping("/loginviaemail")
-    public ResponseEntity<SessionResponse> createSession(@RequestBody LoginByEmailBody body){
+    public ResponseEntity<SessionResponse> createSession(@RequestBody LoginByEmailBody body) {
         return ResponseEntity.ok(sessionService.createSessionByEmail(body));
     }
 
     @PostMapping("/loginviaphone")
-    public ResponseEntity<SessionResponse> createSession(@RequestBody LoginByPhoneBody body){
+    public ResponseEntity<SessionResponse> createSession(@RequestBody LoginByPhoneBody body) {
         return ResponseEntity.ok(sessionService.loginByPhone(body));
     }
 
 
     @GetMapping("/sessions")
-    public ResponseEntity<List<CurrentSessionResponse>> getAllSessions(Authentication authentication){
+    public ResponseEntity<List<CurrentSessionResponse>> getAllSessions(Authentication authentication) {
         return ResponseEntity.ok(sessionService.getAllSessions(authentication));
     }
 
     @GetMapping("/sessions/current")
-    public ResponseEntity<CurrentSessionResponse> getCurrentSession(Authentication authentication){
+    public ResponseEntity<CurrentSessionResponse> getCurrentSession(Authentication authentication) {
         return ResponseEntity.ok(sessionService.getCurrentSession(authentication));
     }
 
     @GetMapping("/sessions/byactive")
-    public ResponseEntity<List<CurrentSessionResponse>> getCurrentSession(Authentication authentication, Boolean active){
+    public ResponseEntity<List<CurrentSessionResponse>> getCurrentSession(Authentication authentication, Boolean active) {
         return ResponseEntity.ok(sessionService.getAllSessionsByActive(authentication, active));
     }
 
 
     @DeleteMapping("/sessions/{id}")
-    public ResponseEntity<?> deleteSession(Authentication authentication, @PathVariable String id){
+    public ResponseEntity<?> deleteSession(Authentication authentication, @PathVariable String id) {
         return ResponseEntity.ok(sessionService.deleteSessionById(authentication, id));
     }
 }

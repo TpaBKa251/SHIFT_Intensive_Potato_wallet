@@ -9,4 +9,5 @@ public record RegisterBody(
         String lastName,
         String email,
         Date birthDate
-) { }
+) {
+}

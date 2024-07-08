@@ -7,7 +7,7 @@ import ru.cft.template.model.response.SessionResponse;
 
 @Component
 public class SessionMapper {
-    public static SessionResponse mapSessionResponse(Session session){
+    public static SessionResponse mapSessionResponse(Session session) {
         return new SessionResponse(
                 session.getId(),
                 session.getUserId(),
@@ -16,7 +16,7 @@ public class SessionMapper {
         );
     }
 
-    public static CurrentSessionResponse mapCurrentSessionResponse(Session session, Boolean active){
+    public static CurrentSessionResponse mapCurrentSessionResponse(Session session, Boolean active) {
         return new CurrentSessionResponse(
                 session.getId(),
                 session.getUserId(),
