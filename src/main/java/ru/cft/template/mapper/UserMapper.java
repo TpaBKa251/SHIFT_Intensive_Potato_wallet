@@ -14,6 +14,7 @@ public class UserMapper {
         user.setPassword(body.password());
         user.setFirstName(body.firstName());
         user.setLastName(body.lastName());
+        user.setMiddleName(body.middleName());
         user.setEmail(body.email());
         user.setPhone(body.phone());
         return user;

@@ -2,7 +2,10 @@ package ru.cft.template.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,25 +25,16 @@ public class User implements UserDetails {
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
     private Wallet wallet;
 
-    @Size(min = 1, max = 50, message = "Name must be at least 1 character and no more than 100")
-    @NotBlank(message = "User firstname cannot be empty")
     private String firstName;
 
-    @Size(min = 1, max = 50, message = "Lastname must be at least 1 character and no more than 100")
-    @NotBlank(message = "User Lastname cannot be empty")
     private String lastName;
 
-    @Size(max = 50, message = "Middle name must be at least 1 character and no more than 100")
     private String middleName;
 
     @Column(unique = true, nullable = false, length = 100)
-    @Size(min = 5, max = 100, message = "Email must be at least 5 character and no more than 100")
-    @NotBlank(message = "User email cannot be empty")
-    @Email(message = "Invalid email")
     private String email;
 
     @Column(nullable = false, name = "birth_date")
-    @NotBlank(message = "User age cannot be empty")
     private Date birthDate;
 
     @Column(nullable = false)
@@ -50,12 +44,8 @@ public class User implements UserDetails {
     private Date lastUpdateDate = new Date();
 
     @Column(unique = true)
-    @Size(min = 5, max = 10, message = "Email must be at least 5 character and no more than 10")
-    @NotBlank(message = "User phone number cannot be empty")
     private Long phone;
 
-    @Size(min = 8, message = "Email must be at least 8 character")
-    @NotBlank(message = "User password cannot be empty")
     private String password;
 
     @Override

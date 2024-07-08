@@ -13,6 +13,8 @@ import ru.cft.template.model.response.UserInfoResponse;
 import ru.cft.template.model.response.UserResponse;
 import ru.cft.template.service.impl.UserServiceImpl;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("potato/api/users")
 @RequiredArgsConstructor
@@ -21,31 +23,38 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @PostMapping()
-    public ResponseEntity<TokenResponse> registerUser(@RequestBody RegisterBody body) {
+    public TokenResponse registerUser(@RequestBody RegisterBody body) {
         log.info("Registering user: {}", body);
-        return ResponseEntity.ok(userService.registerUser(body));
+        return userService.registerUser(body);
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<UserResponse> getUser(Authentication authentication) {
+    public UserResponse getUser(Authentication authentication) {
         log.info("kjdasfh");
-        return ResponseEntity.ok(userService.getUserResponseByAuthentication(authentication));
+        return userService.getUserResponseByAuthentication(authentication);
     }
 
     @PatchMapping("/edit")
-    public ResponseEntity<UserResponse> updateUser(Authentication authentication, @RequestBody UserUpdateBody body) {
-        return ResponseEntity.ok(userService.updateUser(authentication, body));
+    public UserResponse updateUser(Authentication authentication, @RequestBody UserUpdateBody body) {
+        return userService.updateUser(authentication, body);
     }
 
-    @GetMapping("/{phoneNumber}")
-    public ResponseEntity<UserInfoResponse> getUser(@PathVariable Long phoneNumber) {
+    @GetMapping("/findviaphone/{phoneNumber}")
+    public UserInfoResponse getUserByPhone(@PathVariable Long phoneNumber) {
         log.info("Получено");
-        return ResponseEntity.ok(userService.getUserByPhone(phoneNumber));
+        return userService.getUserByPhone(phoneNumber);
     }
 
-    /*@GetMapping("/{email}")
-    public ResponseEntity<UserInfoResponse> getUser(@PathVariable String email){
+    @GetMapping("/findviaemail/{email}")
+    public UserInfoResponse getUserByEmail(@PathVariable String email){
         log.info("Получено");
-        return ResponseEntity.ok(userService.findUserByEmail(email));
-    }*/
+        return userService.findUserByEmail(email);
+    }
+
+    @GetMapping("/{id}")
+    public UserInfoResponse getUserById(@PathVariable String id){
+        UUID uuid = UUID.fromString(id);
+
+        return userService.findUserById(uuid);
+    }
 }

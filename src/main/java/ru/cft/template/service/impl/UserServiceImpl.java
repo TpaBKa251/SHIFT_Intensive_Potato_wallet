@@ -79,19 +79,22 @@ public class UserServiceImpl implements UserDetailsService {
     }
 
     public UserInfoResponse getUserByPhone(Long phone) {
-        return userRepository.getByPhone(phone)
-                .orElseThrow(() -> new UsernameNotFoundException("User with phone: " + phone + " not found"));
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + phone + " not found"));
+        return UserMapper.mapUserInfoToResponse(user);
     }
 
-    public User findUserByPhone(Long phone) {
-        return userRepository.findByPhone(phone)
-                .orElseThrow(() -> new UsernameNotFoundException("User with phone: " + phone + " not found"));
+    public UserInfoResponse findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + email + " not found"));
+        return UserMapper.mapUserInfoToResponse(user);
     }
 
-    /*public UserInfoResponse findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
-    }*/
+    public UserInfoResponse findUserById(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + id + " not found"));
+        return UserMapper.mapUserInfoToResponse(user);
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
