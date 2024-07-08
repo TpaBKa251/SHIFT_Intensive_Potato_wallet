@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public record RegisterBody(
@@ -32,6 +33,6 @@ public record RegisterBody(
         String email,
 
         @NotBlank(message = "User age cannot be empty")
-        Date birthDate
+        LocalDate birthDate
 ) {
 }

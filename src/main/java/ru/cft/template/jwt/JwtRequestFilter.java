@@ -36,7 +36,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-        String jwt = null;
+        String jwt;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
             boolean isBanned = bannedTokenRepository.findByToken(jwt).isPresent();
@@ -47,14 +47,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
             try {
                 UUID userId = jwtTokenUtils.getUserIdFromToken(jwt);
-                if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (userId != null) {
                     User user = userRepository.findById(userId).orElse(null);
-                    if (user != null) {
-                        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                                user, jwt, Collections.emptyList()
-                        );
-                        SecurityContextHolder.getContext().setAuthentication(token);
-                    }
+
+                    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+                            user, jwt, Collections.emptyList()
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(token);
                 }
             } catch (ExpiredJwtException e) {
                 log.debug("Token is expired :(");

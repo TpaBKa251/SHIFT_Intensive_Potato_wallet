@@ -3,6 +3,7 @@ package ru.cft.template.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,5 +19,5 @@ public class Wallet {
     private Long amount;
 
     @Column(nullable = false)
-    private Date lastUpdate = new Date();
+    private LocalDate lastUpdate = LocalDate.now();
 }

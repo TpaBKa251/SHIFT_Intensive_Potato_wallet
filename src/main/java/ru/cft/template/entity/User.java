@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -35,13 +37,13 @@ public class User implements UserDetails {
     private String email;
 
     @Column(nullable = false, name = "birth_date")
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column(nullable = false)
-    private Date registrationDate = new Date();
+    private LocalDate registrationDate = LocalDate.now();
 
     @Column
-    private Date lastUpdateDate = new Date();
+    private LocalDate lastUpdateDate = LocalDate.now();
 
     @Column(unique = true)
     private Long phone;
@@ -50,31 +52,31 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of();
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return firstName + " " + middleName + " " + lastName;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

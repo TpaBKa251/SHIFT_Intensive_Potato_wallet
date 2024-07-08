@@ -13,6 +13,7 @@ import ru.cft.template.repository.WalletRepository;
 import ru.cft.template.jwt.JwtTokenUtils;
 import ru.cft.template.service.WalletService;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class WalletServiceImpl implements WalletService {
     public Wallet createWallet() {
         Wallet wallet = new Wallet();
         wallet.setAmount(0L);
-        wallet.setLastUpdate(new Date());
+        wallet.setLastUpdate(LocalDate.now());
 
         return walletRepository.save(wallet);
     }

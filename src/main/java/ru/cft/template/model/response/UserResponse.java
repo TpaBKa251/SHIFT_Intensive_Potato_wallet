@@ -1,5 +1,6 @@
 package ru.cft.template.model.response;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public record UserResponse(
@@ -10,8 +11,8 @@ public record UserResponse(
         String fullName,
         String email,
         Long phone,
-        Date registrationDate,
-        Date lastUpdateDate,
-        Date birthDate
+        LocalDate registrationDate,
+        LocalDate lastUpdateDate,
+        LocalDate birthDate
 ) {
 }

@@ -20,6 +20,7 @@ import ru.cft.template.repository.SessionRepository;
 import ru.cft.template.repository.UserRepository;
 import ru.cft.template.service.SessionService;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
