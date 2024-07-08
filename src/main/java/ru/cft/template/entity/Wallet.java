@@ -20,4 +20,5 @@ public class Wallet {
 
     @Column(nullable = false)
     private LocalDate lastUpdate = LocalDate.now();
+
 }

@@ -28,5 +28,5 @@ public class Session {
     private Date expirationTime;
 
     @Column(name = "active", nullable = false)
-    private boolean active;
+    private boolean active = true;
 }
