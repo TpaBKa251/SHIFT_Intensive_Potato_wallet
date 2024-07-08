@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -19,6 +20,6 @@ public class Wallet {
     private Long amount;
 
     @Column(nullable = false)
-    private LocalDate lastUpdate = LocalDate.now();
+    private LocalDateTime lastUpdate = LocalDateTime.now();
 
 }
