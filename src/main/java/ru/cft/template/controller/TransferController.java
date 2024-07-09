@@ -26,6 +26,11 @@ public class TransferController {
         return ResponseEntity.ok(transferService.hesoyam(authentication, body));
     }
 
+    @PostMapping("/casino")
+    public ResponseEntity<WalletShortResponse> casino(Authentication authentication, @RequestBody AmountBody body){
+        return ResponseEntity.ok(transferService.casino(authentication, body));
+    }
+
     @PostMapping()
     public ResponseEntity<TransferResponse> createTransferByPhone(
             Authentication authentication,

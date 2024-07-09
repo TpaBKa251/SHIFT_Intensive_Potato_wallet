@@ -19,5 +19,7 @@ public interface TransferService {
 
     WalletShortResponse hesoyam(Authentication authentication, AmountBody body);
 
+    WalletShortResponse casino(Authentication authentication, AmountBody body);
+
     List<TransferResponse> getAllTransfers(Authentication authentication);
 }

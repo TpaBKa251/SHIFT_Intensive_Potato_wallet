@@ -161,6 +161,57 @@ public class TransferServiceImpl implements TransferService {
     }
 
     @Override
+    public WalletShortResponse casino(Authentication authentication, AmountBody body) {
+        if (body.amount() == null) {
+            throw new BadTransactionException("You need to specify the amount to hesoyam from 1 to 1000 m.u.");
+        }
+
+        if (body.amount() > 1000) {
+            throw new BadTransactionException("Too much amount to hesoyam, we poor company and don't have enough money. " +
+                    "Please specify the amount no more than 1000 m.u.");
+        }
+
+        User user = userService.getUserByAuthentication(authentication);
+        Wallet senderWallet = user.getWallet();
+
+        if (senderWallet.getAmount() >= body.amount()) {
+            List<Transfer> lastRefillTransactions = transferRepository
+                    .findLastTransactionsByTypeAndWalletId(
+                            TransferType.REPLENISHMENT,
+                            senderWallet.getId(),
+                            PageRequest.of(0, 4)
+                    );
+
+            Transfer refillTransaction = new Transfer();
+            refillTransaction.setSenderWallet(senderWallet);
+            refillTransaction.setType(TransferType.REPLENISHMENT);
+            refillTransaction.setTransferDateTime(LocalDateTime.now());
+            refillTransaction.setStatus(replenishment(lastRefillTransactions)
+                    ? TransferStatus.SUCCESSFUL : TransferStatus.FAILED);
+
+            if (TransferStatus.SUCCESSFUL.equals(refillTransaction.getStatus())) {
+                senderWallet.setAmount(senderWallet.getAmount() + body.amount());
+                refillTransaction.setAmount(body.amount());
+                walletRepository.save(senderWallet);
+            } else {
+                senderWallet.setAmount(senderWallet.getAmount() - body.amount());
+                refillTransaction.setAmount(body.amount());
+                walletRepository.save(senderWallet);
+            }
+
+            transferRepository.save(refillTransaction);
+        }
+        else {
+            throw new BadTransactionException("You don't have enough money for bet");
+        }
+
+        return new WalletShortResponse(
+                senderWallet.getId(),
+                senderWallet.getAmount()
+        );
+    }
+
+    @Override
     public List<TransferResponse> getAllTransfers(Authentication authentication) {
         return List.of();
     }
