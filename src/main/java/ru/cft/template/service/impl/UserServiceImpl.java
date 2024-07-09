@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.cft.template.entity.User;
 import ru.cft.template.entity.Wallet;
+import ru.cft.template.exception.BadTransactionException;
 import ru.cft.template.mapper.UserMapper;
 import ru.cft.template.model.request.RegisterBody;
 import ru.cft.template.model.response.TokenResponse;
@@ -88,13 +89,18 @@ public class UserServiceImpl implements UserDetailsService {
 
     public UserInfoResponse getUserByPhone(Long phone) {
         User user = userRepository.findByPhone(phone)
-                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + phone + " not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User with phone: " + phone + " not found"));
         return UserMapper.mapUserInfoToResponse(user);
+    }
+
+    public User findUserByPhone(Long phone) {
+        return userRepository.findByPhone(phone)
+                .orElseThrow(() -> new BadTransactionException("User not found for the given phone number"));
     }
 
     public UserInfoResponse findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User with ID: " + email + " not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
         return UserMapper.mapUserInfoToResponse(user);
     }
 
