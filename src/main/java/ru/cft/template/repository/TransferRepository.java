@@ -13,15 +13,13 @@ import java.util.UUID;
 
 @Repository
 public interface TransferRepository extends JpaRepository<Transfer, UUID> {
-    /*List<Transfer> findAllByReceiverId(UUID receiverId);
+    List<Transfer> findAllByRecipientId(UUID recipientId);
 
     List<Transfer> findAllBySenderId(UUID senderId);
 
     List<Transfer> findBySenderWallet(Wallet senderWallet);
 
-    List<Transfer> findByReceiverWallet(Wallet receiverWallet);
-
-    List<Transfer> findBySenderWalletAndType(Wallet senderWallet, TransferType type);*/
+    List<Transfer> findAllByType(TransferType type);
 
     @Query("SELECT t FROM Transfer t WHERE t.senderWallet.id = :walletId AND t.type = :type ORDER BY t.transferDateTime DESC")
     List<Transfer> findLastTransactionsByTypeAndWalletId(TransferType type, UUID walletId, Pageable pageable);

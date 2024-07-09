@@ -35,7 +35,7 @@ public class Transfer {
     @Column
     private UUID recipientId;
 
-    @Column
+    @Column(name = "sender_id")
     private UUID senderId;
 
     @Column

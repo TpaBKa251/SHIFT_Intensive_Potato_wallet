@@ -4,10 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import ru.cft.template.entity.Session;
 import ru.cft.template.entity.Transfer;
 import ru.cft.template.entity.User;
 import ru.cft.template.entity.Wallet;
+import ru.cft.template.exception.AccessRightsException;
 import ru.cft.template.exception.BadTransactionException;
+import ru.cft.template.mapper.SessionMapper;
 import ru.cft.template.mapper.TransferMapper;
 import ru.cft.template.model.TransferStatus;
 import ru.cft.template.model.TransferType;
@@ -24,16 +27,16 @@ import ru.cft.template.service.TransferService;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class TransferServiceImpl implements TransferService {
-
     private final TransferRepository transferRepository;
     private final UserServiceImpl userService;
     private final WalletRepository walletRepository;
 
-
+    //region<Методы перевода по номеру телефона>
     @Override
     public TransferResponse createTransferByRecipientPhone(Authentication authentication, TransferByPhoneBody body) {
         User user = userService.getUserByAuthentication(authentication);
@@ -45,6 +48,7 @@ public class TransferServiceImpl implements TransferService {
         transfer.setTransferDateTime(LocalDateTime.now());
         transfer.setStatus(TransferStatus.SUCCESSFUL);
         transfer.setSenderWallet(senderWallet);
+        transfer.setSenderId(user.getId());
 
         if (body.recipientPhone() != null) {
             createTransferByPhone(transfer, body, senderWallet);
@@ -53,6 +57,7 @@ public class TransferServiceImpl implements TransferService {
         }
 
         senderWallet.setAmount(senderWallet.getAmount() - body.amount());
+        senderWallet.setLastUpdate(LocalDateTime.now());
         walletRepository.save(senderWallet);
 
         transfer.setStatus(TransferStatus.SUCCESSFUL);
@@ -61,60 +66,137 @@ public class TransferServiceImpl implements TransferService {
         return TransferMapper.mapTransferResponse(transfer);
     }
 
-    private void createTransferByPhone(
-            Transfer transaction,
-            TransferByPhoneBody body,
-            Wallet senderWallet
-    ) {
+    private void createTransferByPhone(Transfer transaction, TransferByPhoneBody body, Wallet senderWallet) {
         transaction.setType(TransferType.TRANSFER);
-        Wallet receiverWallet = userService.findUserByPhone(body.recipientPhone()).getWallet();
+        Wallet recipientWallet = userService.findUserByPhone(body.recipientPhone()).getWallet();
+        transaction.setRecipientWallet(recipientWallet);
 
-        if (receiverWallet == null) {
+        if (recipientWallet == null) {
             throw new BadTransactionException("Receiver wallet not found");
         }
 
-        GetValidTransaction(body, senderWallet, transaction);
+        GetValidTransactionByPhone(body, senderWallet, transaction);
 
-        receiverWallet.setAmount(receiverWallet.getAmount() + body.amount());
-        walletRepository.save(receiverWallet);
+        transaction.setRecipientId(userService.findUserByPhone(body.recipientPhone()).getId());
+        transaction.setRecipientPhone(userService.findUserByPhone(body.recipientPhone()).getPhone());
+        recipientWallet.setAmount(recipientWallet.getAmount() + body.amount());
+        recipientWallet.setLastUpdate(LocalDateTime.now());
+        walletRepository.save(recipientWallet);
     }
 
-    private void GetValidTransaction(TransferByPhoneBody body, Wallet senderWallet, Transfer transfer) {
-        if (!isValidTransfer(body)){
+    private void GetValidTransactionByPhone(TransferByPhoneBody body, Wallet senderWallet, Transfer transfer) {
+        if (!isValidTransferByPhone(body)) {
             transfer.setStatus(TransferStatus.FAILED);
             transferRepository.save(transfer);
             throw new BadTransactionException("Invalid transaction request");
         }
 
-        if (!isValidWallet(body, senderWallet)){
+        if (!isValidWalletForTransferByPhone(body, senderWallet)) {
             transfer.setStatus(TransferStatus.FAILED);
             transferRepository.save(transfer);
             throw new BadTransactionException("Insufficient funds or wallet not found");
         }
     }
 
-    private boolean isValidWallet(TransferByPhoneBody body, Wallet senderWallet){
+    private boolean isValidWalletForTransferByPhone(TransferByPhoneBody body, Wallet senderWallet) {
         return senderWallet != null && senderWallet.getAmount() >= body.amount();
     }
 
-    private boolean isValidTransfer(TransferByPhoneBody body) {
+    private boolean isValidTransferByPhone(TransferByPhoneBody body) {
         if (body.amount() == null || body.amount() <= 0) {
             return false;
         }
 
         return (body.recipientPhone() != null);
     }
+//endregion
 
+
+    //region<Методы перевода по ID>
     @Override
     public TransferResponse createTransferByRecipientId(Authentication authentication, TransferByIdBody body) {
-        return null;
+        User user = userService.getUserByAuthentication(authentication);
+        Wallet senderWallet = user.getWallet();
+
+        Transfer transfer = new Transfer();
+
+        transfer.setAmount(body.amount());
+        transfer.setTransferDateTime(LocalDateTime.now());
+        transfer.setStatus(TransferStatus.SUCCESSFUL);
+        transfer.setSenderWallet(senderWallet);
+        transfer.setSenderId(user.getId());
+
+        if (body.recipientId() != null) {
+            createTransferById(transfer, body, senderWallet);
+        } else {
+            throw new BadTransactionException("Invalid transfer request");
+        }
+
+        senderWallet.setAmount(senderWallet.getAmount() - body.amount());
+        senderWallet.setLastUpdate(LocalDateTime.now());
+        walletRepository.save(senderWallet);
+
+        transfer.setStatus(TransferStatus.SUCCESSFUL);
+        transferRepository.save(transfer);
+
+        return TransferMapper.mapTransferResponse(transfer);
     }
 
+    private void createTransferById(Transfer transaction, TransferByIdBody body, Wallet senderWallet) {
+        transaction.setType(TransferType.TRANSFER);
+        Wallet receiverWallet = userService.getUserById(UUID.fromString(body.recipientId())).getWallet();
+        transaction.setRecipientWallet(receiverWallet);
+
+        if (receiverWallet == null) {
+            throw new BadTransactionException("Receiver wallet not found");
+        }
+
+        GetValidTransactionById(body, senderWallet, transaction);
+
+        transaction.setRecipientId(UUID.fromString(body.recipientId()));
+        transaction.setRecipientPhone(userService.findUserById(UUID.fromString(body.recipientId())).phone());
+        receiverWallet.setAmount(receiverWallet.getAmount() + body.amount());
+        receiverWallet.setLastUpdate(LocalDateTime.now());
+        walletRepository.save(receiverWallet);
+    }
+
+    private void GetValidTransactionById(TransferByIdBody body, Wallet senderWallet, Transfer transfer) {
+        if (!isValidTransferById(body)) {
+            transfer.setStatus(TransferStatus.FAILED);
+            transferRepository.save(transfer);
+            throw new BadTransactionException("Invalid transaction request");
+        }
+
+        if (!isValidWalletForTransferById(body, senderWallet)) {
+            transfer.setStatus(TransferStatus.FAILED);
+            transferRepository.save(transfer);
+            throw new BadTransactionException("Insufficient funds or wallet not found");
+        }
+    }
+
+    private boolean isValidWalletForTransferById(TransferByIdBody body, Wallet senderWallet) {
+        return senderWallet != null && senderWallet.getAmount() >= body.amount();
+    }
+
+    private boolean isValidTransferById(TransferByIdBody body) {
+        if (body.amount() == null || body.amount() <= 0) {
+            return false;
+        }
+
+        return (body.recipientId() != null);
+    }
+//endregion
+
+
+    //region<Методы перевода по инвойсу>
     @Override
     public TransferResponse createTransferByInvoice(Authentication authentication, TransferByInvoiceBody body) {
         return null;
     }
+//endregion
 
+
+    //region<Методы пополнения кошелька>
     @Override
     public WalletShortResponse hesoyam(Authentication authentication, AmountBody body) {
 
@@ -123,41 +205,33 @@ public class TransferServiceImpl implements TransferService {
         }
 
         if (body.amount() > 1000) {
-            throw new BadTransactionException("Too much amount to hesoyam, we poor company and don't have enough money. " +
-                    "Please specify the amount no more than 1000 m.u.");
+            throw new BadTransactionException("Too much amount to hesoyam, we poor company and don't have enough money. " + "Please specify the amount no more than 1000 m.u.");
         }
 
         User user = userService.getUserByAuthentication(authentication);
-        Wallet senderWallet = user.getWallet();
+        Wallet recipientWallet = user.getWallet();
 
-        List<Transfer> lastRefillTransactions = transferRepository
-                .findLastTransactionsByTypeAndWalletId(
-                        TransferType.REPLENISHMENT,
-                        senderWallet.getId(),
-                        PageRequest.of(0, 4)
-                );
+        List<Transfer> lastRefillTransactions = transferRepository.findLastTransactionsByTypeAndWalletId(TransferType.REPLENISHMENT, recipientWallet.getId(), PageRequest.of(0, 4));
 
         Transfer refillTransaction = new Transfer();
-        refillTransaction.setSenderWallet(senderWallet);
+        refillTransaction.setRecipientWallet(recipientWallet);
         refillTransaction.setType(TransferType.REPLENISHMENT);
+        refillTransaction.setRecipientId(user.getId());
         refillTransaction.setTransferDateTime(LocalDateTime.now());
-        refillTransaction.setStatus(replenishment(lastRefillTransactions)
-                ? TransferStatus.SUCCESSFUL : TransferStatus.FAILED);
+        refillTransaction.setStatus(replenishment(lastRefillTransactions) ? TransferStatus.SUCCESSFUL : TransferStatus.FAILED);
 
         if (TransferStatus.SUCCESSFUL.equals(refillTransaction.getStatus())) {
-            senderWallet.setAmount(senderWallet.getAmount() + body.amount());
+            recipientWallet.setAmount(recipientWallet.getAmount() + body.amount());
             refillTransaction.setAmount(body.amount());
-            walletRepository.save(senderWallet);
+            recipientWallet.setLastUpdate(LocalDateTime.now());
+            walletRepository.save(recipientWallet);
         } else {
             refillTransaction.setAmount(body.amount());
         }
 
         transferRepository.save(refillTransaction);
 
-        return new WalletShortResponse(
-                senderWallet.getId(),
-                senderWallet.getAmount()
-        );
+        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount());
     }
 
     @Override
@@ -167,61 +241,104 @@ public class TransferServiceImpl implements TransferService {
         }
 
         if (body.amount() > 1000) {
-            throw new BadTransactionException("Too much amount to hesoyam, we poor company and don't have enough money. " +
-                    "Please specify the amount no more than 1000 m.u.");
+            throw new BadTransactionException("Too much amount to hesoyam, we poor company and don't have enough money. " + "Please specify the amount no more than 1000 m.u.");
         }
 
         User user = userService.getUserByAuthentication(authentication);
-        Wallet senderWallet = user.getWallet();
+        Wallet recipientWallet = user.getWallet();
 
-        if (senderWallet.getAmount() >= body.amount()) {
-            List<Transfer> lastRefillTransactions = transferRepository
-                    .findLastTransactionsByTypeAndWalletId(
-                            TransferType.REPLENISHMENT,
-                            senderWallet.getId(),
-                            PageRequest.of(0, 4)
-                    );
+        if (recipientWallet.getAmount() >= body.amount()) {
+            List<Transfer> lastRefillTransactions = transferRepository.findLastTransactionsByTypeAndWalletId(TransferType.REPLENISHMENT, recipientWallet.getId(), PageRequest.of(0, 4));
 
             Transfer refillTransaction = new Transfer();
-            refillTransaction.setSenderWallet(senderWallet);
+            refillTransaction.setRecipientWallet(recipientWallet);
+            refillTransaction.setRecipientId(user.getId());
             refillTransaction.setType(TransferType.REPLENISHMENT);
             refillTransaction.setTransferDateTime(LocalDateTime.now());
-            refillTransaction.setStatus(replenishment(lastRefillTransactions)
-                    ? TransferStatus.SUCCESSFUL : TransferStatus.FAILED);
+            refillTransaction.setStatus(replenishment(lastRefillTransactions) ? TransferStatus.SUCCESSFUL : TransferStatus.FAILED);
 
             if (TransferStatus.SUCCESSFUL.equals(refillTransaction.getStatus())) {
-                senderWallet.setAmount(senderWallet.getAmount() + body.amount());
+                recipientWallet.setAmount(recipientWallet.getAmount() + body.amount() * 2);
                 refillTransaction.setAmount(body.amount());
-                walletRepository.save(senderWallet);
+                recipientWallet.setLastUpdate(LocalDateTime.now());
+                walletRepository.save(recipientWallet);
             } else {
-                senderWallet.setAmount(senderWallet.getAmount() - body.amount());
+                recipientWallet.setAmount(recipientWallet.getAmount() - body.amount());
                 refillTransaction.setAmount(body.amount());
-                walletRepository.save(senderWallet);
+                recipientWallet.setLastUpdate(LocalDateTime.now());
+                walletRepository.save(recipientWallet);
             }
 
             transferRepository.save(refillTransaction);
-        }
-        else {
+        } else {
             throw new BadTransactionException("You don't have enough money for bet");
         }
 
-        return new WalletShortResponse(
-                senderWallet.getId(),
-                senderWallet.getAmount()
-        );
-    }
-
-    @Override
-    public List<TransferResponse> getAllTransfers(Authentication authentication) {
-        return List.of();
+        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount());
     }
 
     private boolean replenishment(List<Transfer> transfers) {
         Random random = new Random();
-        if (transfers.size() >= 3 && transfers.stream()
-                .filter(t -> TransferStatus.FAILED.equals(t.getStatus())).count() >= 3) {
+        if (transfers.size() >= 3 && transfers.stream().filter(t -> TransferStatus.FAILED.equals(t.getStatus())).count() >= 3) {
             return true;
         }
         return random.nextInt(4) == 0;
     }
+//endregion
+
+
+    //region<Геты>
+    @Override
+    public List<TransferResponse> getAllTransfers(Authentication authentication) {
+        User user = userService.getUserByAuthentication(authentication);
+
+        List<Transfer> transfers = transferRepository.findAllBySenderId(user.getId());
+        return transfers.stream()
+                .map(TransferMapper::mapTransferResponse)
+                .toList();
+    }
+
+    @Override
+    public List<TransferResponse> getAllTransfersByRecipientId(Authentication authentication, UUID recipientId) {
+        User user = userService.getUserByAuthentication(authentication);
+
+        if (user != null) {
+            List<Transfer> transfers = transferRepository.findAllByRecipientId(recipientId);
+            return transfers.stream()
+                    .map(TransferMapper::mapTransferResponse)
+                    .toList();
+        }
+
+        throw new AccessRightsException("You don't have enough rights to access this account");
+    }
+
+    @Override
+    public List<TransferResponse> getAllTransfersBySenderWallet(Authentication authentication) {
+        User user = userService.getUserByAuthentication(authentication);
+
+        if (user != null) {
+            List<Transfer> transfers = transferRepository.findBySenderWallet(user.getWallet());
+            return transfers.stream()
+                    .map(TransferMapper::mapTransferResponse)
+                    .toList();
+        }
+
+        throw new AccessRightsException("You don't have enough rights to access this account");
+    }
+
+    @Override
+    public List<TransferResponse> getAllTransfersByType(Authentication authentication, TransferType type) {
+        User user = userService.getUserByAuthentication(authentication);
+
+        if (user != null) {
+            List<Transfer> transfers = transferRepository.findAllByType(type);
+            return transfers.stream()
+                    .map(TransferMapper::mapTransferResponse)
+                    .toList();
+        }
+
+        throw new AccessRightsException("You don't have enough rights to access this account");
+    }
+//endregion
+
 }

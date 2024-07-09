@@ -20,17 +20,17 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class UserController {
+
     private final UserServiceImpl userService;
 
     @PostMapping()
     public TokenResponse registerUser(@RequestBody RegisterBody body) {
-        log.info("Registering user: {}", body);
         return userService.registerUser(body);
     }
 
     @GetMapping("/profile")
     public UserResponse getUser(Authentication authentication) {
-        log.info("kjdasfh");
+        log.info("Получено");
         return userService.getUserResponseByAuthentication(authentication);
     }
 
@@ -48,7 +48,7 @@ public class UserController {
     @GetMapping("/findviaemail/{email}")
     public UserInfoResponse getUserByEmail(@PathVariable String email){
         log.info("Получено");
-        return userService.findUserByEmail(email);
+        return userService.getUserByEmail(email);
     }
 
     @GetMapping("/{id}")

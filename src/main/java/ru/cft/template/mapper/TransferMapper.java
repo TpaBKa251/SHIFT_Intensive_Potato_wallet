@@ -38,9 +38,11 @@ public class TransferMapper {
 
     public static TransferResponse mapTransferResponse(Transfer transfer) {
         return new TransferResponse(
-                transfer.getId().toString(),
-                transfer.getSenderId().toString(),
-                transfer.getRecipientId().toString(),
+                transfer.getId(),
+                transfer.getSenderId(),
+                transfer.getRecipientId(),
+                transfer.getRecipientPhone(),
+                transfer.getInvoiceNumber(),
                 transfer.getAmount(),
                 transfer.getTransferDateTime(),
                 transfer.getStatus(),

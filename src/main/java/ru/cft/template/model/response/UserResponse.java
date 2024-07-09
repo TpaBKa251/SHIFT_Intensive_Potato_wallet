@@ -9,6 +9,7 @@ public record UserResponse(
         String walletId,
         String firstName,
         String lastName,
+        String middleName,
         String fullName,
         String email,
         Long phone,

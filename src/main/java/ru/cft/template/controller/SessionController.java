@@ -41,8 +41,8 @@ public class SessionController {
     }
 
     @GetMapping("/sessions/byactive/{active}")
-    public ResponseEntity<List<CurrentSessionResponse>> getCurrentSession(Authentication authentication, @PathVariable Boolean active) {
-        return ResponseEntity.ok(sessionService.getAllSessionsByActive(authentication, active));
+    public List<CurrentSessionResponse> getCurrentSession(Authentication authentication, @PathVariable Boolean active) {
+        return sessionService.getAllSessionsByActive(authentication, active);
     }
 
 

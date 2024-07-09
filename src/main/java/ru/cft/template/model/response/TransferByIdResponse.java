@@ -1,4 +1,4 @@
 package ru.cft.template.model.response;
 
-public record TransferShortResponse() {
+public record TransferByIdResponse() {
 }

@@ -5,13 +5,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.cft.template.model.TransferType;
 import ru.cft.template.model.request.AmountBody;
+import ru.cft.template.model.request.TransferByIdBody;
+import ru.cft.template.model.request.TransferByInvoiceBody;
 import ru.cft.template.model.request.TransferByPhoneBody;
 import ru.cft.template.model.response.TransferResponse;
 import ru.cft.template.model.response.WalletShortResponse;
 import ru.cft.template.service.TransferService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("potato/api/users/transfers")
@@ -22,20 +26,58 @@ public class TransferController {
     private final TransferService transferService;
 
     @PostMapping("/hesoyam")
-    public ResponseEntity<WalletShortResponse> hesoyam(Authentication authentication, @RequestBody AmountBody body){
-        return ResponseEntity.ok(transferService.hesoyam(authentication, body));
+    public WalletShortResponse hesoyam(Authentication authentication, @RequestBody AmountBody body){
+        return transferService.hesoyam(authentication, body);
     }
 
     @PostMapping("/casino")
-    public ResponseEntity<WalletShortResponse> casino(Authentication authentication, @RequestBody AmountBody body){
-        return ResponseEntity.ok(transferService.casino(authentication, body));
+    public WalletShortResponse casino(Authentication authentication, @RequestBody AmountBody body){
+        return transferService.casino(authentication, body);
     }
 
-    @PostMapping()
-    public ResponseEntity<TransferResponse> createTransferByPhone(
+    @PostMapping("/viaphone")
+    public TransferResponse createTransferByPhone(
             Authentication authentication,
             @RequestBody TransferByPhoneBody body
     ){
-        return ResponseEntity.ok(transferService.createTransferByRecipientPhone(authentication, body));
+        return transferService.createTransferByRecipientPhone(authentication, body);
+    }
+
+    @PostMapping("/viaid")
+    public TransferResponse createTransferById(
+            Authentication authentication,
+            @RequestBody TransferByIdBody body
+    ){
+        return transferService.createTransferByRecipientId(authentication, body);
+    }
+
+    @PostMapping("/viainvoice")
+    public TransferResponse createTransferByInvoice(
+            Authentication authentication,
+            @RequestBody TransferByInvoiceBody body
+    ){
+        return transferService.createTransferByInvoice(authentication, body);
+    }
+
+    @GetMapping("/getall")
+    public List<TransferResponse> getAllTransfers(Authentication authentication){
+        return transferService.getAllTransfers(authentication);
+    }
+
+    @GetMapping("/getviarecipientid/{id}")
+    public List<TransferResponse> getAllTransfersByRecipientId(Authentication authentication, @PathVariable String id){
+        return transferService.getAllTransfersByRecipientId(authentication, UUID.fromString(id));
+    }
+
+    @GetMapping("/getviamywallet")
+    public List<TransferResponse> getAllTransfersBySenderWallet(Authentication authentication){
+        return transferService.getAllTransfersBySenderWallet(authentication);
+    }
+
+    @GetMapping("/getviatype/{type}")
+    public List<TransferResponse> getAllTransfersByType(Authentication authentication, @PathVariable String type){
+        TransferType transferType = TransferType.valueOf(type.toUpperCase());
+        return transferService.getAllTransfersByType(authentication, transferType);
     }
 }
+

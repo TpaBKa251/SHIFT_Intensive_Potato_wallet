@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.cft.template.jwt.JwtRequestFilter;
 import ru.cft.template.service.impl.UserServiceImpl;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
@@ -38,6 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/users/sessions/current").authenticated()
                         .requestMatchers("/users/sessions/byactive").authenticated()
                         .requestMatchers("/users/sessions/{id}").authenticated()
+                        .requestMatchers("/users/transfers/hesoyam").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -49,8 +51,8 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         daoAuthenticationProvider.setUserDetailsService(userService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
         return daoAuthenticationProvider;
     }
 

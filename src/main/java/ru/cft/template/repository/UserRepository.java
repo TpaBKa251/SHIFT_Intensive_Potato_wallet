@@ -14,5 +14,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<User> findByPhone(Long phone);
 
-    //Optional<User> getByPhone(Long phone);
 }

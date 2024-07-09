@@ -3,6 +3,8 @@ package ru.cft.template.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.cft.template.entity.BannedToken;
 import ru.cft.template.entity.Session;
@@ -32,13 +34,13 @@ public class SessionServiceImpl implements SessionService {
     private final UserServiceImpl userService;
     private final SessionRepository sessionRepository;
     private final BannedTokenRepository bannedTokenRepository;
-
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public SessionResponse createSessionByEmail(LoginByEmailBody body) {
         User user = userRepository.findByEmail(body.email())
-                .filter(u -> Objects.equals(body.password(), u.getPassword()))
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email"));
+                .filter(u -> passwordEncoder.matches(body.password(), u.getPassword()))
+                .orElseThrow(() -> new IllegalArgumentException("Incorrect email or password"));
 
         String token = jwtTokenUtils.generateToken(user);
         Date expiredDate = jwtTokenUtils.getExpirationDateFromToken(token);
@@ -56,7 +58,7 @@ public class SessionServiceImpl implements SessionService {
     public SessionResponse loginByPhone(LoginByPhoneBody body) {
         User user = userRepository.findByPhone(body.phone())
                 .filter(u -> Objects.equals(body.password(), u.getPassword()))
-                .orElseThrow(() -> new IllegalArgumentException("Invalid phone"));
+                .orElseThrow(() -> new IllegalArgumentException("Incorrect phone or password"));
 
         String token = jwtTokenUtils.generateToken(user);
         Date expiredDate = jwtTokenUtils.getExpirationDateFromToken(token);

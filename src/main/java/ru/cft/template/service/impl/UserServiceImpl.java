@@ -20,6 +20,7 @@ import ru.cft.template.repository.UserRepository;
 import ru.cft.template.jwt.JwtTokenUtils;
 import ru.cft.template.service.WalletService;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -83,6 +84,8 @@ public class UserServiceImpl implements UserDetailsService {
             user.setBirthDate(body.birthDate());
         }
 
+        user.setLastUpdateDate(LocalDateTime.now());
+
         userRepository.save(user);
         return UserMapper.mapUserToResponse(user);
     }
@@ -98,7 +101,18 @@ public class UserServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new BadTransactionException("User not found for the given phone number"));
     }
 
-    public UserInfoResponse findUserByEmail(String email) {
+    public User findUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadTransactionException("User not found for the given phone number"));
+    }
+
+    public User getUserById(UUID uuid) {
+        return userRepository.findById(uuid)
+                .orElseThrow(() -> new BadTransactionException("User not found for the given phone number"));
+    }
+
+
+    public UserInfoResponse getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found"));
         return UserMapper.mapUserInfoToResponse(user);
