@@ -1,4 +1,8 @@
 package ru.cft.template.model.request;
 
-public record AmountBody(Long amount) {
+import jakarta.validation.constraints.NotBlank;
+
+public record AmountBody(
+        @NotBlank(message = "You need to enter the amount")
+        Long amount) {
 }

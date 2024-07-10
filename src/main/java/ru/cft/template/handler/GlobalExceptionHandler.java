@@ -40,15 +40,13 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public final ResponseEntity<ExceptionResponse> handlerMethodArgumentValidExceptions(MethodArgumentNotValidException exception, WebRequest request) {
+    public final ResponseEntity<Object> handlerMethodArgumentValidExceptions(MethodArgumentNotValidException exception, WebRequest request) {
         String errors = "";
         for (FieldError fieldError : exception.getBindingResult().getFieldErrors()) {
-            errors += fieldError.getDefaultMessage() + ", ";
+            errors += fieldError.getDefaultMessage() + "\n";
         }
 
-        ExceptionResponse exceptionResponse = new ExceptionResponse(errors);
-
-        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = BadTransactionException.class)
@@ -74,9 +72,11 @@ public class GlobalExceptionHandler {
         else if (ex.getMessage().contains("duplicate key")) {
             return new ResponseEntity<>("User with this "
                     + ex.getMessage().substring(ex.getMessage().indexOf('(') + 1, ex.getMessage().indexOf(')'))
-                    + " already exists", HttpStatus.BAD_REQUEST);
+                    + " already exists. If you already have account, you can sign in to it.\nIf you don't have one yet, please enter other information for registration",
+                    HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>("An error occurred: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>("Wrong information", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
