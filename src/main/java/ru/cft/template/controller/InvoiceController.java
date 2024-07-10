@@ -34,4 +34,34 @@ public class InvoiceController {
     public InvoiceResponse cancelInvoice(Authentication authentication, @PathVariable UUID id){
         return invoiceService.cancelInvoice(authentication, id);
     }
+
+    @GetMapping("/getallincoming")
+    public List<InvoiceResponse> getAllIncomingInvoices(Authentication auth){
+        return invoiceService.getAllIncomingInvoices(auth);
+    }
+
+    @GetMapping("/getalloutgoing")
+    public List<InvoiceResponse> getAllOutGoingInvoices(Authentication auth){
+        return invoiceService.getAllOutgoingInvoices(auth);
+    }
+
+    @GetMapping("/{id}")
+    public InvoiceResponse getInvoice(Authentication authentication, @PathVariable UUID id){
+        return invoiceService.getInvoice(authentication, id);
+    }
+
+    @GetMapping("/last")
+    public InvoiceResponse getLastInvoice(Authentication auth){
+        return invoiceService.getLastIncomingInvoice(auth);
+    }
+
+    @GetMapping("/first")
+    public InvoiceResponse getFirstInvoice(Authentication auth){
+        return invoiceService.getFirstIncomingInvoice(auth);
+    }
+
+    @GetMapping("/gettotal")
+    public Long getTotalInvoice(Authentication auth){
+        return invoiceService.getTotalInvoices(auth);
+    }
 }

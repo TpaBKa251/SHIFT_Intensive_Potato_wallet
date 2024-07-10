@@ -23,10 +23,13 @@ public class User implements UserDetails {
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
     private Wallet wallet;
 
+    @Column
     private String firstName;
 
+    @Column
     private String lastName;
 
+    @Column
     private String middleName;
 
     @Column(unique = true, nullable = false, length = 100)
@@ -44,6 +47,7 @@ public class User implements UserDetails {
     @Column(unique = true, name = "phone")
     private Long phone;
 
+    @Column
     private String password;
 
     @Override

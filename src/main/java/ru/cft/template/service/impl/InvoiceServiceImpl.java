@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.cft.template.entity.Invoice;
 import ru.cft.template.entity.User;
 import ru.cft.template.entity.Wallet;
+import ru.cft.template.exception.AccessRightsException;
 import ru.cft.template.mapper.InvoiceMapper;
 import ru.cft.template.model.enums.InvoiceStatus;
 import ru.cft.template.model.enums.InvoiceType;
@@ -99,7 +100,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<InvoiceResponse> getAllIncomingInvoices(Authentication authentication) {
-        return List.of();
+        User user = userService.getUserByAuthentication(authentication);
+        List<Invoice> invoices = invoiceRepository.findByRecipientId(user.getId());
+
+        return invoices.stream()
+                .map(InvoiceMapper::mapInvoiceResponse)
+                .toList();
     }
 
     @Override
@@ -127,5 +133,71 @@ public class InvoiceServiceImpl implements InvoiceService {
         invoiceRepository.save(incomingInvoice);
 
         return InvoiceMapper.mapInvoiceResponse(invoice);
+    }
+
+    @Override
+    public InvoiceResponse getInvoice(Authentication authentication, UUID invoiceId) {
+        User user = userService.getUserByAuthentication(authentication);
+        Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
+
+        if (invoice.getInvoiceHolder().getId().equals(user.getId())) {
+            return InvoiceMapper.mapInvoiceResponse(invoice);
+        }
+        else {
+            throw new AccessRightsException("You do not have the right to access this resource.");
+        }
+    }
+
+    @Override
+    public List<InvoiceResponse> getAllOutgoingInvoices(Authentication authentication) {
+        User user = userService.getUserByAuthentication(authentication);
+        List<Invoice> invoices = invoiceRepository.findBySenderId(user.getId());
+
+        return invoices.stream()
+                .map(InvoiceMapper::mapInvoiceResponse)
+                .toList();
+    }
+
+    @Override
+    public InvoiceResponse getLastIncomingInvoice(Authentication authentication) {
+        User user = userService.getUserByAuthentication(authentication);
+
+        List<Invoice> invoices = invoiceRepository.findLastInvoiceByInvoiceHolderId(user.getId());
+
+        Invoice invoice = invoices.get(0);
+
+        if (invoice == null){
+            throw new RuntimeException("Invoice not found");
+        }
+        return InvoiceMapper.mapInvoiceResponse(invoice);
+    }
+
+    @Override
+    public InvoiceResponse getFirstIncomingInvoice(Authentication authentication) {
+        User user = userService.getUserByAuthentication(authentication);
+
+        List<Invoice> invoices = invoiceRepository.findLastInvoiceByInvoiceHolderId(user.getId());
+
+        Invoice invoice = invoices.get(invoices.size()-1);
+
+        if (invoice == null){
+            throw new RuntimeException("Invoice not found");
+        }
+        return InvoiceMapper.mapInvoiceResponse(invoice);
+    }
+
+    @Override
+    public Long getTotalInvoices(Authentication authentication) {
+        User user = userService.getUserByAuthentication(authentication);
+        List<Invoice> invoices = invoiceRepository.findByRecipientId(user.getId());
+
+        long totalInvoices = 0L;
+        for (Invoice invoice : invoices) {
+            if (invoice.getStatus() == InvoiceStatus.UNPAID) {
+                totalInvoices += invoice.getAmount();
+            }
+        }
+
+        return totalInvoices;
     }
 }

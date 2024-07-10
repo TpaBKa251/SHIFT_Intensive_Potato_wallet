@@ -15,4 +15,14 @@ public interface InvoiceService {
     List<InvoiceResponse> getAllIncomingInvoices(Authentication authentication);
 
     InvoiceResponse cancelInvoice(Authentication authentication, UUID invoiceId);
+
+    InvoiceResponse getInvoice(Authentication authentication, UUID invoiceId);
+
+    List<InvoiceResponse> getAllOutgoingInvoices(Authentication authentication);
+
+    InvoiceResponse getLastIncomingInvoice(Authentication authentication);
+
+    InvoiceResponse getFirstIncomingInvoice(Authentication authentication);
+
+    Long getTotalInvoices(Authentication authentication);
 }
