@@ -1,5 +1,6 @@
 package ru.cft.template.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -25,19 +26,19 @@ public class TransferController {
     private final TransferService transferService;
 
     @PostMapping("/hesoyam")
-    public WalletShortResponse hesoyam(Authentication authentication, @RequestBody AmountBody body){
+    public WalletShortResponse hesoyam(Authentication authentication, @RequestBody @Valid AmountBody body){
         return transferService.hesoyam(authentication, body);
     }
 
     @PostMapping("/casino")
-    public WalletShortResponse casino(Authentication authentication, @RequestBody AmountBody body){
+    public WalletShortResponse casino(Authentication authentication, @RequestBody @Valid AmountBody body){
         return transferService.casino(authentication, body);
     }
 
     @PostMapping("/viaphone")
     public TransferResponse createTransferByPhone(
             Authentication authentication,
-            @RequestBody TransferByPhoneBody body
+            @RequestBody @Valid TransferByPhoneBody body
     ){
         return transferService.createTransferByRecipientPhone(authentication, body);
     }
@@ -45,7 +46,7 @@ public class TransferController {
     @PostMapping("/viaid")
     public TransferResponse createTransferById(
             Authentication authentication,
-            @RequestBody TransferByIdBody body
+            @RequestBody @Valid TransferByIdBody body
     ){
         return transferService.createTransferByRecipientId(authentication, body);
     }
@@ -53,7 +54,7 @@ public class TransferController {
     @PostMapping("/viainvoice")
     public TransferResponse createTransferByInvoice(
             Authentication authentication,
-            @RequestBody TransferByInvoiceBody body
+            @RequestBody @Valid TransferByInvoiceBody body
     ){
         return transferService.createTransferByInvoice(authentication, body);
     }

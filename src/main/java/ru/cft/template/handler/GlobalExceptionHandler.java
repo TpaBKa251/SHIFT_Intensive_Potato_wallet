@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public final ResponseEntity<Object> handlerMethodArgumentValidExceptions(MethodArgumentNotValidException exception, WebRequest request) {
+    public final ResponseEntity<Object> handlerMethodArgumentValidExceptions(MethodArgumentNotValidException exception) {
         String errors = "";
         for (FieldError fieldError : exception.getBindingResult().getFieldErrors()) {
             errors += fieldError.getDefaultMessage() + "\n";

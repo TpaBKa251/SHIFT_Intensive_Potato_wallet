@@ -13,7 +13,7 @@ public record TransferResponse(
         UUID senderId,
         UUID recipientId,
         Long recipientPhone,
-        Long invoiceNumber,
+        UUID invoiceId,
         Long amount,
         LocalDateTime transferDateTime,
         TransferStatus transferStatus,

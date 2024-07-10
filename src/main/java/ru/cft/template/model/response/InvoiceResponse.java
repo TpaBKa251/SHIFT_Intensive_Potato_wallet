@@ -11,7 +11,6 @@ public record InvoiceResponse(
         UUID senderId,
         UUID recipientId,
         Long amount,
-        Long invoiceNumber,
         InvoiceStatus invoiceStatus,
         InvoiceType invoiceType,
         LocalDateTime invoiceDateTime,

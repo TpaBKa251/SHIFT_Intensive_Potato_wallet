@@ -4,12 +4,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import ru.cft.template.entity.Invoice;
 import ru.cft.template.entity.Transfer;
 import ru.cft.template.entity.User;
 import ru.cft.template.entity.Wallet;
 import ru.cft.template.exception.AccessRightsException;
 import ru.cft.template.exception.BadTransactionException;
 import ru.cft.template.mapper.TransferMapper;
+import ru.cft.template.model.enums.InvoiceStatus;
+import ru.cft.template.model.enums.InvoiceType;
 import ru.cft.template.model.enums.TransferStatus;
 import ru.cft.template.model.enums.TransferType;
 import ru.cft.template.model.request.AmountBody;
@@ -18,8 +21,10 @@ import ru.cft.template.model.request.TransferByInvoiceBody;
 import ru.cft.template.model.request.TransferByPhoneBody;
 import ru.cft.template.model.response.TransferResponse;
 import ru.cft.template.model.response.WalletShortResponse;
+import ru.cft.template.repository.InvoiceRepository;
 import ru.cft.template.repository.TransferRepository;
 import ru.cft.template.repository.WalletRepository;
+import ru.cft.template.service.InvoiceService;
 import ru.cft.template.service.TransferService;
 
 import java.time.LocalDateTime;
@@ -33,6 +38,7 @@ public class TransferServiceImpl implements TransferService {
     private final TransferRepository transferRepository;
     private final UserServiceImpl userService;
     private final WalletRepository walletRepository;
+    private final InvoiceRepository invoiceRepository;
 
     //region<Методы перевода по номеру телефона>
     @Override
@@ -189,7 +195,108 @@ public class TransferServiceImpl implements TransferService {
     //region<Методы перевода по инвойсу>
     @Override
     public TransferResponse createTransferByInvoice(Authentication authentication, TransferByInvoiceBody body) {
-        return null;
+        User invoiceRecipientWhichPayTheInvoice = userService.getUserByAuthentication(authentication);
+        Wallet payManWallet = invoiceRecipientWhichPayTheInvoice.getWallet();
+
+        Transfer transfer = new Transfer();
+        Invoice invoiceToPay = invoiceRepository.findById(body.invoiceId()).orElse(null);
+
+        assert invoiceToPay != null;
+
+        if (invoiceToPay.getStatus() == InvoiceStatus.PAID) {
+            throw new BadTransactionException("Invoice already payed");
+        }
+        else if (invoiceToPay.getType() == InvoiceType.OUTGOING){
+            throw new BadTransactionException("You is trying to pay an outgoing invoice");
+        }
+        else if (invoiceToPay.getStatus() == InvoiceStatus.CANCELLED){
+            throw new BadTransactionException("Invoice has been cancelled");
+        }
+
+        User invoiceSenderWhichGetPayForInvoice = userService.getUserById(invoiceToPay.getSender().getId());
+
+        Invoice invoiceOutGoing = invoiceRepository.finByInvoiceHolderIdAndInvoiceNumber(invoiceSenderWhichGetPayForInvoice.getId(), invoiceToPay.getInvoiceNumber());
+
+        transfer.setAmount(invoiceToPay.getAmount());
+        transfer.setTransferDateTime(LocalDateTime.now());
+        transfer.setStatus(TransferStatus.SUCCESSFUL);
+        transfer.setSenderWallet(payManWallet);
+        transfer.setSenderId(invoiceRecipientWhichPayTheInvoice.getId());
+        transfer.setInvoiceId(body.invoiceId());
+
+        createTransferByInvoice(transfer, body, payManWallet);
+
+        payManWallet.setAmount(payManWallet.getAmount() - invoiceToPay.getAmount());
+        payManWallet.setLastUpdate(LocalDateTime.now());
+        walletRepository.save(payManWallet);
+
+        invoiceToPay.setStatus(InvoiceStatus.PAID);
+        invoiceToPay.setPayDateTime(LocalDateTime.now());
+        invoiceRepository.save(invoiceToPay);
+
+        invoiceOutGoing.setStatus(InvoiceStatus.PAID);
+        invoiceOutGoing.setPayDateTime(LocalDateTime.now());
+        invoiceRepository.save(invoiceOutGoing);
+
+        transfer.setStatus(TransferStatus.SUCCESSFUL);
+        transferRepository.save(transfer);
+
+        return TransferMapper.mapTransferResponse(transfer);
+    }
+
+    private void createTransferByInvoice(Transfer transaction, TransferByInvoiceBody body, Wallet senderWallet) {
+        transaction.setType(TransferType.PAYMENT);
+        Invoice invoiceToPay = invoiceRepository.findById(body.invoiceId()).orElse(null);
+        assert invoiceToPay != null;
+
+        User user = userService.getUserById(invoiceToPay.getSender().getId());
+
+        Wallet getPayManWallet = user.getWallet();
+        transaction.setRecipientWallet(getPayManWallet);
+
+        if (getPayManWallet == null) {
+            throw new BadTransactionException("Receiver wallet not found");
+        }
+
+        GetValidTransactionByInvoice(body, senderWallet, transaction);
+
+        transaction.setRecipientId(invoiceToPay.getSender().getId());
+        transaction.setRecipientPhone(userService.findUserById(invoiceToPay.getSender().getId()).phone());
+        getPayManWallet.setAmount(getPayManWallet.getAmount() + invoiceToPay.getAmount());
+        getPayManWallet.setLastUpdate(LocalDateTime.now());
+        walletRepository.save(getPayManWallet);
+    }
+
+    private void GetValidTransactionByInvoice(TransferByInvoiceBody body, Wallet senderWallet, Transfer transfer) {
+        if (!isValidTransferByInvoice(body)) {
+            transfer.setStatus(TransferStatus.FAILED);
+            transferRepository.save(transfer);
+            throw new BadTransactionException("Invalid transaction request");
+        }
+
+        if (!isValidWalletForTransferByInvoice(body, senderWallet)) {
+            transfer.setStatus(TransferStatus.FAILED);
+            transferRepository.save(transfer);
+            throw new BadTransactionException("Insufficient funds or wallet not found");
+        }
+    }
+
+    private boolean isValidWalletForTransferByInvoice(TransferByInvoiceBody body, Wallet senderWallet) {
+        Invoice invoiceToPay = invoiceRepository.findById(body.invoiceId()).orElse(null);
+        assert invoiceToPay != null;
+
+        return senderWallet != null && senderWallet.getAmount() >= invoiceToPay.getAmount();
+    }
+
+    private boolean isValidTransferByInvoice(TransferByInvoiceBody body) {
+        Invoice invoiceToPay = invoiceRepository.findById(body.invoiceId()).orElse(null);
+        assert invoiceToPay != null;
+
+        if (invoiceToPay.getAmount() == null || invoiceToPay.getAmount() <= 0) {
+            return false;
+        }
+
+        return (body.invoiceId() != null);
     }
 //endregion
 

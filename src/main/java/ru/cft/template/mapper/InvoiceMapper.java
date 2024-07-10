@@ -13,7 +13,6 @@ public class InvoiceMapper {
                 invoice.getSender().getId(),
                 invoice.getRecipient().getId(),
                 invoice.getAmount(),
-                invoice.getInvoiceNumber(),
                 invoice.getStatus(),
                 invoice.getType(),
                 invoice.getInvoiceDateTime(),

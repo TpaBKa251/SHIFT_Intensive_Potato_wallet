@@ -42,7 +42,7 @@ public class TransferMapper {
                 transfer.getSenderId(),
                 transfer.getRecipientId(),
                 transfer.getRecipientPhone(),
-                transfer.getInvoiceNumber(),
+                transfer.getInvoiceId(),
                 transfer.getAmount(),
                 transfer.getTransferDateTime(),
                 transfer.getStatus(),

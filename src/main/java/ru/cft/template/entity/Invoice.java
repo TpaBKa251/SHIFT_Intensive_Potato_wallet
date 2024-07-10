@@ -20,6 +20,10 @@ public class Invoice {
     private UUID id;
 
     @ManyToOne
+    @JoinColumn(name = "invoice_holder", referencedColumnName = "id")
+    private User invoiceHolder;
+
+    @ManyToOne
     @JoinColumn(name = "sender_id", referencedColumnName = "id")
     private User sender;
 
@@ -27,11 +31,11 @@ public class Invoice {
     @JoinColumn(name = "recipient_id", referencedColumnName = "id")
     private User recipient;
 
-    @Column(nullable = false)
-    private Long amount;
+    @Column(name = "invoice_id")
+    private Long invoiceNumber;
 
     @Column(nullable = false)
-    private Long invoiceNumber;
+    private Long amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

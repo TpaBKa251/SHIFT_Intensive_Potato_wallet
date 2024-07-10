@@ -37,7 +37,7 @@ public class Transfer {
     private UUID senderId;
 
     @Column
-    private Long invoiceNumber;
+    private UUID invoiceId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
