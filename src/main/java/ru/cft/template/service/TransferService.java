@@ -6,6 +6,7 @@ import ru.cft.template.model.request.AmountBody;
 import ru.cft.template.model.request.TransferByIdBody;
 import ru.cft.template.model.request.TransferByInvoiceBody;
 import ru.cft.template.model.request.TransferByPhoneBody;
+import ru.cft.template.model.response.TransactionHistoryResponse;
 import ru.cft.template.model.response.TransferResponse;
 import ru.cft.template.model.response.WalletShortResponse;
 
@@ -30,4 +31,8 @@ public interface TransferService {
     List<TransferResponse> getAllTransfersBySenderWallet(Authentication authentication);
 
     List<TransferResponse> getAllTransfersByType(Authentication authentication, TransferType type);
+
+    WalletShortResponse roulette(Authentication authentication, AmountBody body, Long amount, Long min, Long max);
+
+    List<TransactionHistoryResponse> getHistory(Authentication authentication, TransferType type);
 }

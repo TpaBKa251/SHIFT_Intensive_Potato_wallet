@@ -21,6 +21,9 @@ public interface TransferRepository extends JpaRepository<Transfer, UUID> {
 
     List<Transfer> findAllByType(TransferType type);
 
+    List<Transfer> findBySenderWalletAndType(Wallet senderWallet, TransferType type);
+
+
     @Query("SELECT t FROM Transfer t WHERE t.senderWallet.id = :walletId AND t.type = :type ORDER BY t.transferDateTime DESC")
     List<Transfer> findLastTransactionsByTypeAndWalletId(TransferType type, UUID walletId, Pageable pageable);
 }

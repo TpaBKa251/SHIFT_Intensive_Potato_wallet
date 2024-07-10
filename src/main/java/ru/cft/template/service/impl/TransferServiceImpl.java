@@ -19,6 +19,7 @@ import ru.cft.template.model.request.AmountBody;
 import ru.cft.template.model.request.TransferByIdBody;
 import ru.cft.template.model.request.TransferByInvoiceBody;
 import ru.cft.template.model.request.TransferByPhoneBody;
+import ru.cft.template.model.response.TransactionHistoryResponse;
 import ru.cft.template.model.response.TransferResponse;
 import ru.cft.template.model.response.WalletShortResponse;
 import ru.cft.template.repository.InvoiceRepository;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -342,11 +344,11 @@ public class TransferServiceImpl implements TransferService {
     @Override
     public WalletShortResponse casino(Authentication authentication, AmountBody body) {
         if (body.amount() == null) {
-            throw new BadTransactionException("You need to specify the amount to hesoyam from 1 to 1000 m.u.");
+            throw new BadTransactionException("You need to specify the amount to casino from 1 to 1000 m.u.");
         }
 
         if (body.amount() > 1000) {
-            throw new BadTransactionException("Too much amount to hesoyam, we poor company and don't have enough money. " + "Please specify the amount no more than 1000 m.u.");
+            throw new BadTransactionException("Too much amount to casino, we poor company and don't have enough money. " + "Please specify the amount no more than 1000 m.u.");
         }
 
         User user = userService.getUserByAuthentication(authentication);
@@ -375,6 +377,37 @@ public class TransferServiceImpl implements TransferService {
             }
 
             transferRepository.save(refillTransaction);
+        } else {
+            throw new BadTransactionException("You don't have enough money for bet");
+        }
+
+        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount());
+    }
+
+    @Override
+    public WalletShortResponse roulette(Authentication authentication, AmountBody body, Long amount, Long min, Long max) {
+        Random random = new Random();
+
+        if (body.amount() == null) {
+            throw new BadTransactionException("You need to specify the amount to hesoyam from 1 to 1000 m.u.");
+        }
+
+        if (body.amount() > 1000) {
+            throw new BadTransactionException("Too much amount to hesoyam, we poor company and don't have enough money. " + "Please specify the amount no more than 1000 m.u.");
+        }
+
+        User user = userService.getUserByAuthentication(authentication);
+        Wallet recipientWallet = user.getWallet();
+
+        if (recipientWallet.getAmount() >= body.amount()) {
+            if (random.nextLong(min, max+1) == amount){
+                recipientWallet.setAmount(recipientWallet.getAmount() + body.amount() * (max - min));
+                walletRepository.save(recipientWallet);
+            }
+            else {
+                recipientWallet.setAmount(recipientWallet.getAmount() - body.amount());
+                walletRepository.save(recipientWallet);
+            }
         } else {
             throw new BadTransactionException("You don't have enough money for bet");
         }
@@ -443,6 +476,22 @@ public class TransferServiceImpl implements TransferService {
         }
 
         throw new AccessRightsException("You don't have enough rights to access this account");
+    }
+
+    public List<TransactionHistoryResponse> getHistory(Authentication authentication, TransferType type) {
+        User user = userService.getUserByAuthentication(authentication);
+        Wallet userWallet = user.getWallet();
+
+        List<Transfer> transactions;
+        if (type == null) {
+            transactions = transferRepository.findBySenderWallet(userWallet);
+        } else {
+            transactions = transferRepository.findBySenderWalletAndType(userWallet, type);
+        }
+
+        return transactions.stream()
+                .map(TransferMapper::mapTransactionToHistory)
+                .collect(Collectors.toList());
     }
 //endregion
 

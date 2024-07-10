@@ -10,6 +10,7 @@ import ru.cft.template.model.request.AmountBody;
 import ru.cft.template.model.request.TransferByIdBody;
 import ru.cft.template.model.request.TransferByInvoiceBody;
 import ru.cft.template.model.request.TransferByPhoneBody;
+import ru.cft.template.model.response.TransactionHistoryResponse;
 import ru.cft.template.model.response.TransferResponse;
 import ru.cft.template.model.response.WalletShortResponse;
 import ru.cft.template.service.TransferService;
@@ -33,6 +34,11 @@ public class TransferController {
     @PostMapping("/casino")
     public WalletShortResponse casino(Authentication authentication, @RequestBody @Valid AmountBody body){
         return transferService.casino(authentication, body);
+    }
+
+    @PostMapping("/roulette/{min}/{max}/{number}")
+    public WalletShortResponse casino(Authentication authentication, @RequestBody @Valid AmountBody body, @PathVariable long min, @PathVariable long max, @PathVariable long number){
+        return transferService.roulette(authentication, body, number, min, max);
     }
 
     @PostMapping("/viaphone")
@@ -78,6 +84,12 @@ public class TransferController {
     public List<TransferResponse> getAllTransfersByType(Authentication authentication, @PathVariable String type){
         TransferType transferType = TransferType.valueOf(type.toUpperCase());
         return transferService.getAllTransfersByType(authentication, transferType);
+    }
+
+    @GetMapping("/getHistory/{type}")
+    public List<TransactionHistoryResponse> getHistory(Authentication authentication, @PathVariable String type){
+        type = type.toUpperCase();
+        return transferService.getHistory(authentication, TransferType.valueOf(type));
     }
 }
 
