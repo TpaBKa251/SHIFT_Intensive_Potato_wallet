@@ -21,10 +21,10 @@ create table users
         unique,
     birth_date        date                                not null
         constraint users_birth_date_check
-            check ((CURRENT_DATE - birth_date) >= 6570),
+            check (date_part('year',age(birth_date::date)) >= 18),
     registration_date timestamp default CURRENT_TIMESTAMP not null,
     last_update_date  timestamp default CURRENT_TIMESTAMP not null,
-    phone             bigint
+    phone             bigint                              not null
         unique,
     password          varchar                             not null
 );

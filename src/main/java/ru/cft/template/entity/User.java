@@ -1,18 +1,13 @@
 package ru.cft.template.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +41,7 @@ public class User implements UserDetails {
     @Column
     private LocalDateTime lastUpdateDate = LocalDateTime.now();
 
-    @Column(unique = true)
+    @Column(unique = true, name = "phone")
     private Long phone;
 
     private String password;

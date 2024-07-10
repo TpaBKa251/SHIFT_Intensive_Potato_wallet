@@ -1,11 +1,10 @@
 package ru.cft.template.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import ru.cft.template.entity.User;
 import ru.cft.template.model.request.RegisterBody;
 import ru.cft.template.model.request.UserUpdateBody;
 import ru.cft.template.model.response.TokenResponse;
@@ -24,7 +23,7 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @PostMapping()
-    public TokenResponse registerUser(@RequestBody RegisterBody body) {
+    public TokenResponse registerUser(@RequestBody @Valid RegisterBody body) {
         return userService.registerUser(body);
     }
 

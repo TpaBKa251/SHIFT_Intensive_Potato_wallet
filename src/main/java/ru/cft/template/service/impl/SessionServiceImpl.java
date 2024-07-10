@@ -57,7 +57,7 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public SessionResponse loginByPhone(LoginByPhoneBody body) {
         User user = userRepository.findByPhone(body.phone())
-                .filter(u -> Objects.equals(body.password(), u.getPassword()))
+                .filter(u -> passwordEncoder.matches(body.password(), u.getPassword()))
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect phone or password"));
 
         String token = jwtTokenUtils.generateToken(user);

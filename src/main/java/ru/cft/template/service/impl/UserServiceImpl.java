@@ -11,6 +11,7 @@ import ru.cft.template.entity.User;
 import ru.cft.template.entity.Wallet;
 import ru.cft.template.exception.BadTransactionException;
 import ru.cft.template.mapper.UserMapper;
+import ru.cft.template.model.request.LoginByEmailBody;
 import ru.cft.template.model.request.RegisterBody;
 import ru.cft.template.model.response.TokenResponse;
 import ru.cft.template.model.response.UserInfoResponse;
@@ -18,6 +19,7 @@ import ru.cft.template.model.response.UserResponse;
 import ru.cft.template.model.request.UserUpdateBody;
 import ru.cft.template.repository.UserRepository;
 import ru.cft.template.jwt.JwtTokenUtils;
+import ru.cft.template.service.SessionService;
 import ru.cft.template.service.WalletService;
 
 import java.time.LocalDateTime;
