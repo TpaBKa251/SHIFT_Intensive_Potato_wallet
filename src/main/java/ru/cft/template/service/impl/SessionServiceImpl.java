@@ -135,4 +135,25 @@ public class SessionServiceImpl implements SessionService {
 
         return ResponseEntity.ok().build();
     }
+
+    @Override
+    public SessionResponse logout(Authentication authentication, UUID sessionId) {
+        User user = userService.getUserByAuthentication(authentication);
+        UUID userId = user.getId();
+
+        Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFoundException("Session not found"));
+
+        if (!session.getUserId().equals(userId)) {
+            throw new AccessRightsException("You can only logout from your own sessions");
+        }
+
+        BannedToken bannedToken = new BannedToken();
+        bannedToken.setToken(authentication.getCredentials().toString());
+        bannedTokenRepository.save(bannedToken);
+
+        session.setActive(false);
+        sessionRepository.save(session);
+
+        return SessionMapper.mapSessionResponse(session);
+    }
 }

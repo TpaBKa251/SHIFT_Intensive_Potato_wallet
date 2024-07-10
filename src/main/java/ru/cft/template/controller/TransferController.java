@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("potato/api/users/transfers")
+@RequestMapping("potato/api/transfers")
 @RequiredArgsConstructor
 @Slf4j
 public class TransferController {

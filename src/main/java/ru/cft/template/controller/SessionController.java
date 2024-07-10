@@ -11,9 +11,10 @@ import ru.cft.template.model.response.SessionResponse;
 import ru.cft.template.service.SessionService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("potato/api/users")
+@RequestMapping("potato/api/sessions")
 @RequiredArgsConstructor
 public class SessionController {
 
@@ -30,24 +31,29 @@ public class SessionController {
     }
 
 
-    @GetMapping("/sessions")
+    @GetMapping("/getall")
     public List<CurrentSessionResponse> getAllSessions(Authentication authentication) {
         return sessionService.getAllSessions(authentication);
     }
 
-    @GetMapping("/sessions/current")
+    @GetMapping("/current")
     public CurrentSessionResponse getCurrentSession(Authentication authentication) {
         return sessionService.getCurrentSession(authentication);
     }
 
-    @GetMapping("/sessions/byactive/{active}")
+    @GetMapping("/byactive/{active}")
     public List<CurrentSessionResponse> getCurrentSession(Authentication authentication, @PathVariable Boolean active) {
         return sessionService.getAllSessionsByActive(authentication, active);
     }
 
 
-    @DeleteMapping("/sessions/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSession(Authentication authentication, @PathVariable String id) {
         return ResponseEntity.ok(sessionService.deleteSessionById(authentication, id));
+    }
+
+    @PatchMapping("/logout/{id}")
+    public SessionResponse logout(Authentication authentication, @PathVariable UUID id) {
+        return sessionService.logout(authentication, id);
     }
 }
