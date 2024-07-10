@@ -2,12 +2,10 @@ package ru.cft.template.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import ru.cft.template.model.TransferStatus;
-import ru.cft.template.model.TransferType;
+import ru.cft.template.model.enums.TransferStatus;
+import ru.cft.template.model.enums.TransferType;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Data

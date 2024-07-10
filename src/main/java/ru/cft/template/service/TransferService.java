@@ -1,8 +1,7 @@
 package ru.cft.template.service;
 
 import org.springframework.security.core.Authentication;
-import ru.cft.template.entity.Wallet;
-import ru.cft.template.model.TransferType;
+import ru.cft.template.model.enums.TransferType;
 import ru.cft.template.model.request.AmountBody;
 import ru.cft.template.model.request.TransferByIdBody;
 import ru.cft.template.model.request.TransferByInvoiceBody;

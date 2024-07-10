@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.cft.template.entity.Transfer;
 import ru.cft.template.entity.Wallet;
-import ru.cft.template.model.TransferType;
+import ru.cft.template.model.enums.TransferType;
 
 import java.util.List;
 import java.util.UUID;

@@ -1,10 +1,8 @@
 package ru.cft.template.model.response;
 
 import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import ru.cft.template.model.TransferStatus;
-import ru.cft.template.model.TransferType;
+import ru.cft.template.model.enums.TransferStatus;
+import ru.cft.template.model.enums.TransferType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

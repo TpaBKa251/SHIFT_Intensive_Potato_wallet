@@ -29,12 +29,12 @@ public class TransferMapper {
         return transfer;
     }
 
-    public static Transfer mapTransferByInvoiceBodyResponse(TransferByInvoiceBody body) {
+    /*public static Transfer mapTransferByInvoiceBodyResponse(TransferByInvoiceBody body) {
         Transfer transfer = new Transfer();
-        transfer.setInvoiceNumber(Long.valueOf(body.invoiceId()));
+        transfer.setInvoice();
 
         return transfer;
-    }
+    }*/
 
     public static TransferResponse mapTransferResponse(Transfer transfer) {
         return new TransferResponse(

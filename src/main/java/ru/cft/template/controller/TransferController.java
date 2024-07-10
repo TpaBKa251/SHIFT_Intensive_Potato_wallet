@@ -2,10 +2,9 @@ package ru.cft.template.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import ru.cft.template.model.TransferType;
+import ru.cft.template.model.enums.TransferType;
 import ru.cft.template.model.request.AmountBody;
 import ru.cft.template.model.request.TransferByIdBody;
 import ru.cft.template.model.request.TransferByInvoiceBody;
