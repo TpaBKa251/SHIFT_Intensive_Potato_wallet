@@ -162,9 +162,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceResponse getLastIncomingInvoice(Authentication authentication) {
         User user = userService.getUserByAuthentication(authentication);
 
-        List<Invoice> invoices = invoiceRepository.findLastInvoiceByInvoiceHolderId(user.getId());
-
-        Invoice invoice = invoices.get(0);
+        Invoice invoice = invoiceRepository.findLastInvoiceByInvoiceHolderId(user.getId());
 
         if (invoice == null){
             throw new RuntimeException("Invoice not found");
@@ -176,9 +174,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceResponse getFirstIncomingInvoice(Authentication authentication) {
         User user = userService.getUserByAuthentication(authentication);
 
-        List<Invoice> invoices = invoiceRepository.findLastInvoiceByInvoiceHolderId(user.getId());
-
-        Invoice invoice = invoices.get(invoices.size()-1);
+        Invoice invoice = invoiceRepository.findFirstInvoiceByInvoiceHolderId(user.getId());
 
         if (invoice == null){
             throw new RuntimeException("Invoice not found");
