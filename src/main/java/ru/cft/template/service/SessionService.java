@@ -24,5 +24,5 @@ public interface SessionService {
 
     ResponseEntity<?> deleteSessionById(Authentication authentication, String id);
 
-    SessionResponse logout(Authentication authentication, UUID sessionId);
+    SessionResponse logout(Authentication authentication);
 }

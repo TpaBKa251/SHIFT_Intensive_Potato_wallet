@@ -1,6 +1,7 @@
 package ru.cft.template.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import ru.cft.template.service.SessionService;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("potato/api/sessions")
 @RequiredArgsConstructor
@@ -52,8 +54,9 @@ public class SessionController {
         return ResponseEntity.ok(sessionService.deleteSessionById(authentication, id));
     }
 
-    @PatchMapping("/logout/{id}")
-    public SessionResponse logout(Authentication authentication, @PathVariable UUID id) {
-        return sessionService.logout(authentication, id);
+    @PatchMapping("/logout")
+    public SessionResponse logout(Authentication authentication) {
+        log.info("Вошли");
+        return sessionService.logout(authentication);
     }
 }

@@ -1,6 +1,7 @@
 package ru.cft.template.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,6 +26,7 @@ import ru.cft.template.service.SessionService;
 import java.time.LocalDate;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SessionServiceImpl implements SessionService {
@@ -137,22 +139,28 @@ public class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public SessionResponse logout(Authentication authentication, UUID sessionId) {
-        User user = userService.getUserByAuthentication(authentication);
-        UUID userId = user.getId();
+    public SessionResponse logout(Authentication authentication) {
+        String currentToken = (String) authentication.getCredentials();
+        log.info("Взят токен");
 
-        Session session = sessionRepository.findById(sessionId).orElseThrow(() -> new SessionNotFoundException("Session not found"));
+        Session session = sessionRepository.findByToken(currentToken).orElse(null);
 
-        if (!session.getUserId().equals(userId)) {
-            throw new AccessRightsException("You can only logout from your own sessions");
-        }
+        log.info("Найдена сессия");
+
+//        if (!session.getUserId().equals(userId)) {
+//            throw new AccessRightsException("You can only logout from your own sessions");
+//        }
 
         BannedToken bannedToken = new BannedToken();
         bannedToken.setToken(authentication.getCredentials().toString());
         bannedTokenRepository.save(bannedToken);
 
+        log.info("Токен забанен");
+
         session.setActive(false);
         sessionRepository.save(session);
+
+        log.info("Сохранено");
 
         return SessionMapper.mapSessionResponse(session);
     }

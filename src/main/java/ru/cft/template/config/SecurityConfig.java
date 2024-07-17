@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/users/sessions/byactive").authenticated()
                         .requestMatchers("/users/sessions/{id}").authenticated()
                         .requestMatchers("/users/transfers/hesoyam").authenticated()
+                        .requestMatchers("/sessions/logout").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
