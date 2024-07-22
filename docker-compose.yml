@@ -8,9 +8,9 @@ services:
     volumes:
       - ./postgres:/docker-entrypoint-initdb.d
     environment:
-      - POSTGRES_DB=wallet_spgk
+      - POSTGRES_DB=wallet
       - POSTGRES_USER=wallet
-      - POSTGRES_PASSWORD=DOpiXiuhloDbOhkneKhA3OcYCzwqlnio
+      - POSTGRES_PASSWORD=wallet
     ports:
       - "5432:5432"
  #  Сервис для разворачивания контейнера с приложением
@@ -24,9 +24,9 @@ services:
     depends_on:
       - postgres
     environment:
-      - SPRING_DATASOURCE_URL=postgresql://wallet:DOpiXiuhloDbOhkneKhA3OcYCzwqlnio@dpg-cqfapmt6l47c739m9lb0-a/wallet_spgk
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/wallet
       - POSTGRES_USER=wallet
-      - POSTGRES_PASSWORD=DOpiXiuhloDbOhkneKhA3OcYCzwqlnio
+      - POSTGRES_PASSWORD=wallet
     healthcheck:
       test: curl http://localhost:8080 || exit 0
       interval: 10s
