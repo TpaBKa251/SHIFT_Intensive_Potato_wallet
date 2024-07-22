@@ -15,9 +15,9 @@ spring:
         # По умолчанию postgresql имеет 5432 порт. Но так как подразумевается запуск через docker-compose, указан порт
         # из docker-compose.yaml для корректной проброски. Если у вас локально установлен postgresql и вы собираетесь
         # использовать его, то требуется поменить его на нужный
-        url: jdbc:postgresql://localhost:5432/wallet
+        url: postgresql://wallet:DOpiXiuhloDbOhkneKhA3OcYCzwqlnio@dpg-cqfapmt6l47c739m9lb0-a/wallet_spgk
         username: wallet
-        password: wallet
+        password: DOpiXiuhloDbOhkneKhA3OcYCzwqlnio
     flyway:
         enabled: true
         locations:
