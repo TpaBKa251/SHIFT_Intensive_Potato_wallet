@@ -324,6 +324,7 @@ public class TransferServiceImpl implements TransferService {
         refillTransaction.setRecipientWallet(recipientWallet);
         refillTransaction.setType(TransferType.REPLENISHMENT);
         refillTransaction.setRecipientId(user.getId());
+        refillTransaction.setSenderId(user.getId());
         refillTransaction.setTransferDateTime(LocalDateTime.now());
         refillTransaction.setStatus(replenishment(lastRefillTransactions) ? TransferStatus.SUCCESSFUL : TransferStatus.FAILED);
 
@@ -338,7 +339,7 @@ public class TransferServiceImpl implements TransferService {
 
         transferRepository.save(refillTransaction);
 
-        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount());
+        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount(), refillTransaction.getStatus().toString());
     }
 
     @Override
@@ -377,11 +378,11 @@ public class TransferServiceImpl implements TransferService {
             }
 
             transferRepository.save(refillTransaction);
+            return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount(), refillTransaction.getStatus().toString());
+
         } else {
             throw new BadTransactionException("You don't have enough money for bet");
         }
-
-        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount());
     }
 
     @Override
@@ -399,20 +400,24 @@ public class TransferServiceImpl implements TransferService {
         User user = userService.getUserByAuthentication(authentication);
         Wallet recipientWallet = user.getWallet();
 
+        String s = "";
+
         if (recipientWallet.getAmount() >= body.amount()) {
             if (random.nextLong(min, max+1) == amount){
                 recipientWallet.setAmount(recipientWallet.getAmount() + body.amount() * (max - min));
                 walletRepository.save(recipientWallet);
+                s = "Неудача!";
             }
             else {
                 recipientWallet.setAmount(recipientWallet.getAmount() - body.amount());
                 walletRepository.save(recipientWallet);
+                s = "Успех";
             }
         } else {
             throw new BadTransactionException("You don't have enough money for bet");
         }
 
-        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount());
+        return new WalletShortResponse(recipientWallet.getId(), recipientWallet.getAmount(), s);
     }
 
     private boolean replenishment(List<Transfer> transfers) {

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record WalletShortResponse(
         UUID billId,
-        Long amount
+        Long amount,
+        String result
 ) {
 }
