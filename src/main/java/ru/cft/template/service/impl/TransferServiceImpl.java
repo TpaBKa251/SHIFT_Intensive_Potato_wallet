@@ -73,9 +73,12 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void createTransferByPhone(Transfer transaction, TransferByPhoneBody body, Wallet senderWallet) {
+        Transfer recipientTransfer = transaction;
+        recipientTransfer.setType(TransferType.REPLENISHMENT);
         transaction.setType(TransferType.TRANSFER);
         Wallet recipientWallet = userService.findUserByPhone(body.recipientPhone()).getWallet();
         transaction.setRecipientWallet(recipientWallet);
+        recipientTransfer.setRecipientWallet(recipientWallet);
 
         if (recipientWallet == null) {
             throw new BadTransactionException("Receiver wallet not found");
@@ -84,10 +87,14 @@ public class TransferServiceImpl implements TransferService {
         GetValidTransactionByPhone(body, senderWallet, transaction);
 
         transaction.setRecipientId(userService.findUserByPhone(body.recipientPhone()).getId());
+        recipientTransfer.setRecipientId(userService.findUserByPhone(body.recipientPhone()).getId());
         transaction.setRecipientPhone(userService.findUserByPhone(body.recipientPhone()).getPhone());
+        recipientTransfer.setRecipientPhone(userService.findUserByPhone(body.recipientPhone()).getPhone());
+        recipientTransfer.setStatus(TransferStatus.SUCCESSFUL);
         recipientWallet.setAmount(recipientWallet.getAmount() + body.amount());
         recipientWallet.setLastUpdate(LocalDateTime.now());
         walletRepository.save(recipientWallet);
+        transferRepository.save(recipientTransfer);
     }
 
     private void GetValidTransactionByPhone(TransferByPhoneBody body, Wallet senderWallet, Transfer transfer) {
@@ -149,9 +156,12 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void createTransferById(Transfer transaction, TransferByIdBody body, Wallet senderWallet) {
+        Transfer recipientTransfer = transaction;
+        recipientTransfer.setType(TransferType.REPLENISHMENT);
         transaction.setType(TransferType.TRANSFER);
         Wallet receiverWallet = userService.getUserById(UUID.fromString(body.recipientId())).getWallet();
         transaction.setRecipientWallet(receiverWallet);
+        recipientTransfer.setRecipientWallet(receiverWallet);
 
         if (receiverWallet == null) {
             throw new BadTransactionException("Receiver wallet not found");
@@ -160,10 +170,14 @@ public class TransferServiceImpl implements TransferService {
         GetValidTransactionById(body, senderWallet, transaction);
 
         transaction.setRecipientId(UUID.fromString(body.recipientId()));
+        recipientTransfer.setRecipientId(UUID.fromString(body.recipientId()));
         transaction.setRecipientPhone(userService.findUserById(UUID.fromString(body.recipientId())).phone());
+        recipientTransfer.setRecipientPhone(userService.findUserById(UUID.fromString(body.recipientId())).phone());
+        recipientTransfer.setStatus(TransferStatus.SUCCESSFUL);
         receiverWallet.setAmount(receiverWallet.getAmount() + body.amount());
         receiverWallet.setLastUpdate(LocalDateTime.now());
         walletRepository.save(receiverWallet);
+        transferRepository.save(recipientTransfer);
     }
 
     private void GetValidTransactionById(TransferByIdBody body, Wallet senderWallet, Transfer transfer) {
@@ -247,6 +261,8 @@ public class TransferServiceImpl implements TransferService {
     }
 
     private void createTransferByInvoice(Transfer transaction, TransferByInvoiceBody body, Wallet senderWallet) {
+        Transfer recipientTransfer = transaction;
+        recipientTransfer.setType(TransferType.REPLENISHMENT);
         transaction.setType(TransferType.PAYMENT);
         Invoice invoiceToPay = invoiceRepository.findById(body.invoiceId()).orElse(null);
         assert invoiceToPay != null;
@@ -255,6 +271,7 @@ public class TransferServiceImpl implements TransferService {
 
         Wallet getPayManWallet = user.getWallet();
         transaction.setRecipientWallet(getPayManWallet);
+        recipientTransfer.setRecipientWallet(getPayManWallet);
 
         if (getPayManWallet == null) {
             throw new BadTransactionException("Receiver wallet not found");
@@ -263,10 +280,14 @@ public class TransferServiceImpl implements TransferService {
         GetValidTransactionByInvoice(body, senderWallet, transaction);
 
         transaction.setRecipientId(invoiceToPay.getSender().getId());
+        recipientTransfer.setRecipientId(invoiceToPay.getSender().getId());
         transaction.setRecipientPhone(userService.findUserById(invoiceToPay.getSender().getId()).phone());
+        recipientTransfer.setRecipientPhone(userService.findUserById(invoiceToPay.getSender().getId()).phone());
+        recipientTransfer.setStatus(TransferStatus.SUCCESSFUL);
         getPayManWallet.setAmount(getPayManWallet.getAmount() + invoiceToPay.getAmount());
         getPayManWallet.setLastUpdate(LocalDateTime.now());
         walletRepository.save(getPayManWallet);
+        transferRepository.save(recipientTransfer);
     }
 
     private void GetValidTransactionByInvoice(TransferByInvoiceBody body, Wallet senderWallet, Transfer transfer) {
@@ -324,7 +345,7 @@ public class TransferServiceImpl implements TransferService {
         refillTransaction.setRecipientWallet(recipientWallet);
         refillTransaction.setType(TransferType.REPLENISHMENT);
         refillTransaction.setRecipientId(user.getId());
-        refillTransaction.setSenderId(user.getId());
+        //refillTransaction.setSenderId(user.getId());
         refillTransaction.setTransferDateTime(LocalDateTime.now());
         refillTransaction.setStatus(replenishment(lastRefillTransactions) ? TransferStatus.SUCCESSFUL : TransferStatus.FAILED);
 
@@ -436,6 +457,7 @@ public class TransferServiceImpl implements TransferService {
         User user = userService.getUserByAuthentication(authentication);
 
         List<Transfer> transfers = transferRepository.findAllBySenderId(user.getId());
+        transfers.addAll(transferRepository.findByRecipientIdAndType(user.getId(), TransferType.REPLENISHMENT));
         return transfers.stream()
                 .map(TransferMapper::mapTransferResponse)
                 .toList();
