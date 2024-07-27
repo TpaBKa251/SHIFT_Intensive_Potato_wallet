@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @PatchMapping("/edit")
-    public UserResponse updateUser(Authentication authentication, @RequestBody UserUpdateBody body) {
+    public UserResponse updateUser(Authentication authentication, @RequestBody @Valid UserUpdateBody body) {
         return userService.updateUser(authentication, body);
     }
 

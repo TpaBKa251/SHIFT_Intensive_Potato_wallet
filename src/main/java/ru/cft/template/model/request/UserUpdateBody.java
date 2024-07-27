@@ -11,16 +11,16 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public record UserUpdateBody(
-        @Size(min = 1, max = 50, message = "First name must be at least 1 character and no more than 50")
-        @Pattern(regexp = "^[А-ЯЁ][а-яё]{1,50}$", message = "First name must consist Cyrillic letters and first letter must be uppercase")
+        @Size(max = 50, message = "First name must be at least 1 character and no more than 50")
+        @Pattern(regexp = "^$|^[А-ЯЁ][а-яё]{1,50}$", message = "First name must consist Cyrillic letters and first letter must be uppercase")
         String firstName,
 
-        @Size(min = 1, max = 50, message = "Last name must be at least 1 character and no more than 50")
-        @Pattern(regexp = "^[А-ЯЁ][а-яё]{1,50}$", message = "Last name must consist Cyrillic letters and first letter must be uppercase")
+        @Size(max = 50, message = "Last name must be at least 1 character and no more than 50")
+        @Pattern(regexp = "^$|^[А-ЯЁ][а-яё]{1,50}$", message = "Last name must consist Cyrillic letters and first letter must be uppercase")
         String lastName,
 
         @Size(max = 50, message = "Middle name must be no more than 50")
-        @Pattern(regexp = "^[А-ЯЁ][а-яё]{1,50}$", message = "Middle name must consist Cyrillic letters and first letter must be uppercase")
+        @Pattern(regexp = "^$|^[А-ЯЁ][а-яё]{1,50}$", message = "Middle name must consist Cyrillic letters and first letter must be uppercase")
         String middleName,
 
         @Past(message = "You born in future?")
