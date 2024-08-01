@@ -32,7 +32,7 @@ public record RegisterBody(
         String lastName,
 
         @Size(max = 50, message = "Middle name must be no more than 50")
-        @Pattern(regexp = "^$|^[А-ЯЁ][а-яё]{0,50}$", message = "Middle name must consist Cyrillic letters and first letter must be uppercase")
+        @Pattern(regexp = "^$|^([А-ЯЁ][а-яё]{0,50})$", message = "Middle name must consist Cyrillic letters and first letter must be uppercase")
         String middleName,
 
         @Size(min = 5, max = 100, message = "Email must be at least 5 character and no more than 100")
