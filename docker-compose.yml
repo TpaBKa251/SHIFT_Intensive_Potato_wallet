@@ -25,8 +25,8 @@ services:
       - postgres
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cqfpp1pu0jms7386bqbg-a:5432/wallet_v9dv
-      - POSTGRES_USER=wallet_v9dv_user
-      - POSTGRES_PASSWORD=GAqNaY7ew86J0SOs8JdaUVtVWUv6hyoL
+      - SPRING_DATASOURCE_USERNAME=wallet_v9dv_user
+      - SPRING_DATASOURCE_PASSWORD=GAqNaY7ew86J0SOs8JdaUVtVWUv6hyoL
     healthcheck:
       test: curl http://localhost:8080 || exit 0
       interval: 10s
