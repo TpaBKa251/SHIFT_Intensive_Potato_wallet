@@ -11,6 +11,11 @@ services:
       - "5432:5432"
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
 
   webapi:
     build:
@@ -26,6 +31,12 @@ services:
       - postgres
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080 || exit 1" ]
+      interval: 10s
+      retries: 5
+      start_period: 15s
+      timeout: 10s
 
 networks:
   app-network:
