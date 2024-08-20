@@ -13,6 +13,8 @@ services:
       - POSTGRES_PASSWORD=GAqNaY7ew86J0SOs8JdaUVtVWUv6hyoL
     ports:
       - "5432:5432"
+    networks:
+      - app-network
  #  Сервис для разворачивания контейнера с приложением
   webapi:
     build:
@@ -27,9 +29,15 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cqfpp1pu0jms7386bqbg-a:5432/wallet_v9dv
       - SPRING_DATASOURCE_USERNAME=wallet_v9dv_user
       - SPRING_DATASOURCE_PASSWORD=GAqNaY7ew86J0SOs8JdaUVtVWUv6hyoL
+    networks:
+      - app-network
     healthcheck:
       test: curl http://localhost:8080 || exit 0
       interval: 10s
       retries: 5
       start_period: 15s
       timeout: 10s
+
+networks:
+  app-network:
+    driver: bridge
