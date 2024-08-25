@@ -19,12 +19,12 @@ services:
 
   webapi:
     build:
-      dockerfile: webapi_docker/Dockerfile
+      dockerfile: Dockerfile
       context: .
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/wallet_v9dv
-      - SPRING_DATASOURCE_USERNAME=wallet_v9dv_user
-      - SPRING_DATASOURCE_PASSWORD=GAqNaY7ew86J0SOs8JdaUVtVWUv6hyoL
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cr5ir7tumphs73e4rnjg-a:5432/wallet_gu3s
+      - SPRING_DATASOURCE_USERNAME=wallet_gu3s_user
+      - SPRING_DATASOURCE_PASSWORD=hiNaqnJ9xOzXp3PMw88rSpDajcBs23je
     ports:
       - "8080:8080"
     depends_on:
