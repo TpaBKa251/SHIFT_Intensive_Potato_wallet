@@ -1,1 +1,1 @@
-GRANT ALL PRIVILEGES ON DATABASE wallet_v9dv to wallet;
+GRANT ALL PRIVILEGES ON DATABASE wallet_gu3s to wallet;
