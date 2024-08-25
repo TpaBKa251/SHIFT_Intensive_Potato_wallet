@@ -1,5 +1,6 @@
 version: '3.9'
 services:
+  # Сервис для разворачивания контейнера с базой данных
   postgres:
     container_name: postgres
     image: postgres:12
@@ -12,28 +13,23 @@ services:
       - POSTGRES_PASSWORD=hiNaqnJ9xOzXp3PMw88rSpDajcBs23je
     ports:
       - "5432:5432"
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-      interval: 10s
-      retries: 5
-      timeout: 5s
-
+  #  Сервис для разворачивания контейнера с приложением
   webapi:
     build:
       dockerfile: Dockerfile
       context: .
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cr5ir7tumphs73e4rnjg-a:5432/wallet_gu3s
-      - SPRING_DATASOURCE_USERNAME=wallet_gu3s_user
-      - SPRING_DATASOURCE_PASSWORD=hiNaqnJ9xOzXp3PMw88rSpDajcBs23je
+    hostname: webapi
     ports:
       - "8080:8080"
     depends_on:
       - postgres
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cr5ir7tumphs73e4rnjg-a:5432/wallet_gu3s
+      - POSTGRES_USER=wallet_gu3s_user
+      - POSTGRES_PASSWORD=hiNaqnJ9xOzXp3PMw88rSpDajcBs23je
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080 || exit 1" ]
+      test: curl http://localhost:8080 || exit 0
       interval: 10s
       retries: 5
       start_period: 15s
       timeout: 10s
-

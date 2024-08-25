@@ -21,7 +21,7 @@ spring:
     flyway:
         enabled: true
         locations:
-          - db.migration
+            - db.migration
 
 springdoc:
     swagger-ui:
