@@ -1,5 +1,5 @@
-RUN --mount=type=cache,target=/root/.cache \
-    docker-compose build --no-cache
+#RUN --mount=type=cache,target=/root/.cache \
+#    docker-compose build --no-cache
 
 FROM openjdk:17-jdk-slim
 COPY ./build/libs/template-0.0.1.jar /opt/service.jar
