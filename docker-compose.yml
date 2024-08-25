@@ -24,7 +24,7 @@ services:
     depends_on:
       - postgres
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cr5ir7tumphs73e4rnjg-a:5432/wallet_gu3s
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dpg-cr5ir7tumphs73e4rnjg-a.frankfurt-postgres.render.com:5432/wallet_gu3s
       - POSTGRES_USER=wallet_gu3s_user
       - POSTGRES_PASSWORD=hiNaqnJ9xOzXp3PMw88rSpDajcBs23je
     healthcheck:
