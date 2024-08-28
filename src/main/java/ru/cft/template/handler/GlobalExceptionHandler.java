@@ -105,5 +105,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleGenericException(Exception ex) {
         return new ResponseEntity<>("An error occurred: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<Object> handleNullPointerException(NullPointerException ex) {
+        return new ResponseEntity<>("An error occurred: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
 }
 
