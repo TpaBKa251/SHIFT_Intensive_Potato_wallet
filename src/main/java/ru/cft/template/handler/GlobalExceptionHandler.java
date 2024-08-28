@@ -1,6 +1,7 @@
 package ru.cft.template.handler;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -93,6 +94,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex) {
         return new ResponseEntity<>("Authentication exception: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(MalformedJwtException.class)
+    public ResponseEntity<Object> handleMalformedJwtException(MalformedJwtException ex) {
+        return new ResponseEntity<>("Malformed token: " + ex.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = Exception.class)
