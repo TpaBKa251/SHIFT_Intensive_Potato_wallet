@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.hibernate.engine.jdbc.spi.SqlExceptionHelper;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -66,7 +68,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 BannedToken bannedToken = new BannedToken();
 
                 bannedToken.setToken(jwt);
-                bannedTokenRepository.save(bannedToken);
+                try {
+                    bannedTokenRepository.save(bannedToken);
+                } catch (ConstraintViolationException ex) {
+                    throw e;
+                }
+
 
                 if (session != null) {
                     session.setActive(false);
