@@ -70,14 +70,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 bannedToken.setToken(jwt);
                 try {
                     bannedTokenRepository.save(bannedToken);
-                } catch (ConstraintViolationException ex) {
-                    throw e;
-                }
 
+                    if (session != null) {
+                        session.setActive(false);
+                        sessionRepository.save(session);
+                    }
 
-                if (session != null) {
-                    session.setActive(false);
-                    sessionRepository.save(session);
+                } catch (Exception ex) {
+                    return;
                 }
 
                 throw e;
