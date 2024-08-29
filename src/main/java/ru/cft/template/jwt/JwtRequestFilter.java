@@ -82,8 +82,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 } catch (Exception ex) {
                     return;
                 }
-
-                throw e;
             } catch (Exception e) {
                 log.error("Error processing JWT", e);
             }
