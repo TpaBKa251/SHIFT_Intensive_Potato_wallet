@@ -13,8 +13,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import ru.cft.template.entity.BannedToken;
+import ru.cft.template.entity.Session;
 import ru.cft.template.entity.User;
 import ru.cft.template.repository.BannedTokenRepository;
+import ru.cft.template.repository.SessionRepository;
 import ru.cft.template.repository.UserRepository;
 
 import java.io.IOException;
@@ -28,6 +31,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtTokenUtils jwtTokenUtils;
     private final UserRepository userRepository;
     private final BannedTokenRepository bannedTokenRepository;
+    private final SessionRepository sessionRepository;
 
     @Override
     protected void doFilterInternal(
@@ -57,6 +61,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 }
             } catch (ExpiredJwtException e) {
                 log.debug("Token is expired :(");
+
+                Session session = sessionRepository.findByToken(jwt).orElse(null);
+                BannedToken bannedToken = new BannedToken();
+
+                bannedToken.setToken(jwt);
+                bannedTokenRepository.save(bannedToken);
+
+                if (session != null) {
+                    session.setActive(false);
+                    sessionRepository.save(session);
+                }
+
+                throw e;
             } catch (Exception e) {
                 log.error("Error processing JWT", e);
             }
